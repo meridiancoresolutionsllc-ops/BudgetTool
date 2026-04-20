@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudgetTool</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+button,input,select{font-family:inherit}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#888;border-radius:3px}
+:root{--bg:#f2f4fa;--card:#fff;--bord:#e0e4ef;--tx:#1a1d27;--txm:#6b7394;--acc:#4f86c6;--inp:#f8f9fd;--green:#6ac47a;--red:#c46b7a;--orange:#c4895e;--blue:#4f86c6}
+body.dark{--bg:#0f1117;--card:#1a1d27;--bord:#2e3248;--tx:#e8eaf6;--txm:#8890b0;--acc:#7eb8a3;--inp:#1e2136}
+#header{background:var(--card);border-bottom:1px solid var(--bord);position:sticky;top:0;z-index:100;padding:0 16px}
+#header-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:54px;gap:8px}
+#body{max-width:1080px;margin:0 auto;padding:20px 14px 60px}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-icon{width:28px;height:28px;border-radius:7px;background:var(--acc);display:flex;align-items:center;justify-content:center}
+.logo-text{font-weight:700;font-size:16px;color:var(--tx)}
+nav{display:flex;gap:2px;overflow:auto}
+.tab-btn{background:none;border:none;padding:7px 12px;cursor:pointer;border-radius:7px;font-size:13px;font-weight:600;color:var(--txm);white-space:nowrap;transition:all .15s}
+.tab-btn.active{color:var(--acc);background:rgba(79,134,198,.15)}
+.mobile-tab-wrap{display:none;min-width:160px}
+.mobile-tab-select{background:var(--card);border:1px solid var(--bord);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--tx);width:100%}
+.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:15px 18px}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--txm);margin-bottom:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.kpi-card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 10px;text-align:center}
+.kpi-label{font-size:11px;color:var(--txm);font-weight:700;margin-bottom:5px}
+.kpi-value{font-size:18px;font-weight:700}
+.btn{border-radius:7px;padding:7px 15px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--acc);color:#fff;border-color:var(--acc)}
+.btn-ghost{background:transparent;color:var(--txm);border-color:var(--bord)}
+.btn-danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-sm{padding:4px 10px;font-size:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;font-weight:600;color:var(--txm)}
+.inp{background:var(--inp);border:1px solid var(--bord);border-radius:7px;padding:7px 11px;font-size:13px;color:var(--tx);outline:none;width:100%}
+.inp:focus{border-color:var(--acc)}
+.form-col{display:flex;flex-direction:column;gap:12px}
+.form-actions{display:flex;gap:8px;margin-top:4px}
+.cb-row{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--tx)}
+.cb-row input{width:16px;height:16px;cursor:pointer;accent-color:var(--acc)}
+.badge{font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;display:inline-block;white-space:nowrap}
+.mini-bar{margin-bottom:9px}
+.mb-labels{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+.mb-track{background:var(--bord);border-radius:3px;height:5px;overflow:hidden}
+.mb-fill{height:100%;border-radius:3px;transition:width .4s}
+.row-item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--bord)}
+.row-item:last-child{border-bottom:none}
+.row-l{display:flex;align-items:center;gap:10px}
+.row-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.row-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.item-card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.item-card.paid-card{opacity:.62}.item-card.overdue{border-left:3px solid var(--red)}.item-card.soon{border-left:3px solid var(--orange)}.item-card.upcoming-inc{border-left:3px solid var(--acc)}
+.alloc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.alloc-row{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.rm-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;line-height:1;padding:2px}
+.timeline-wrap{padding-left:22px;position:relative}
+.t-line{position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--bord)}
+.t-item{position:relative;margin-bottom:16px}
+.t-dot{position:absolute;left:-14px;top:5px;width:13px;height:13px;border-radius:50%;border:2px solid var(--card)}
+.t-card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px}
+.t-card.today{border-left:3px solid var(--acc)}.t-card.past{opacity:.52}
+.t-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+#sync-bar{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border-radius:8px;font-weight:600;border:1px solid transparent;transition:all .3s}
+#sync-bar.idle{background:rgba(106,196,122,.12);border-color:rgba(106,196,122,.3);color:var(--green)}
+#sync-bar.syncing{background:rgba(79,134,198,.12);border-color:rgba(79,134,198,.3);color:var(--acc)}
+#sync-bar.loading{background:rgba(79,134,198,.12);border-color:rgba(79,134,198,.3);color:var(--acc)}
+#sync-bar.error{background:rgba(196,107,122,.12);border-color:rgba(196,107,122,.3);color:var(--red)}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.spinning{display:inline-block;animation:spin 1s linear infinite}
+#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:16px}
+#modal-overlay.open{display:flex}
+#modal-box{background:var(--card);border-radius:14px;padding:22px 24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
+#modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+#modal-title{font-weight:700;font-size:17px;color:var(--tx)}
+#modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--txm);line-height:1}
+#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200}
+#loading-screen.hidden{display:none}
+.spin-big{font-size:36px;display:inline-block;animation:spin 1s linear infinite}
+.page{display:none}.page.active{display:block}
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:20px;font-weight:700;color:var(--tx)}
+@media(max-width:640px){.grid-2,.kpi-grid{grid-template-columns:1fr 1fr!important}.alloc-grid{grid-template-columns:1fr!important}.timeline-grid{grid-template-columns:1fr!important}.nav-label{display:inline}nav{display:none}.mobile-tab-wrap{display:block;width:100%}#header-inner{align-items:flex-start}.header-right{width:100%;justify-content:space-between;flex-wrap:wrap}#sync-bar{flex:1 1 auto}}
+</style>
+</head>
+<body>
+
+<div id="loading-screen">
+  <span class="spin-big">↻</span>
+  <div style="color:var(--txm);font-size:14px" id="load-msg">Loading your budget…</div>
+</div>
+
+
+<!-- Hidden iframe + form for POST save -->
+<iframe id="sync-frame" name="sync-frame" style="display:none"></iframe>
+<form id="sync-form" method="POST" target="sync-frame" style="display:none">
+  <input type="hidden" id="sync-action" name="action" value="save">
+  <input type="hidden" id="sync-payload" name="payload" value="">
+</form>
+
+<div id="app" style="display:none">
+  <div id="header"><div id="header-inner">
+    <div class="logo">
+      <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <span class="logo-text">BudgetTool</span>
+    </div>
+    <nav>
+      <button class="tab-btn active" data-tab="dashboard">⬛ <span class="nav-label">Dashboard</span></button>
+      <button class="tab-btn" data-tab="income">💵 <span class="nav-label">Income</span></button>
+      <button class="tab-btn" data-tab="bills">📋 <span class="nav-label">Bills</span></button>
+      <button class="tab-btn" data-tab="allocate">🔀 <span class="nav-label">Allocate</span></button>
+      <button class="tab-btn" data-tab="timeline">📅 <span class="nav-label">Timeline</span></button>
+    </nav>
+    <div class="mobile-tab-wrap">
+      <select id="mobile-tab-select" class="mobile-tab-select" aria-label="Navigate sections">
+        <option value="dashboard">Dashboard</option>
+        <option value="income">Income</option>
+        <option value="bills">Bills</option>
+        <option value="allocate">Allocate</option>
+        <option value="timeline">Timeline</option>
+      </select>
+    </div>
+    <div class="header-right">
+      <div id="sync-bar" class="idle"><span id="sync-icon">✓</span><span id="sync-text">Not synced yet</span><button class="btn btn-sm" id="sync-now-btn" style="font-size:11px;padding:2px 8px;border-color:currentColor;background:transparent;color:inherit">Sync</button></div>
+      <button class="btn btn-ghost btn-sm" id="export-btn">⬇ JSON</button>
+      <button id="theme-btn" style="background:none;border:1px solid var(--bord);border-radius:7px;padding:4px 8px;cursor:pointer;font-size:14px">🌙</button>
+    </div>
+  </div></div>
+
+  <div id="body">
+    <div id="page-dashboard" class="page active">
+      <div class="kpi-grid" id="kpi-grid"></div>
+      <div class="grid-2">
+        <div class="card"><div class="sec-title">Upcoming Bills — Next 30 Days</div><div id="upcoming-list"></div></div>
+        <div class="card"><div class="sec-title">Spending by Category</div><div id="cat-bars"></div></div>
+        <div class="card"><div class="sec-title">Income vs Expenses</div><div id="income-bars"></div>
+          <div style="border-top:1px solid var(--bord);padding-top:9px;margin-top:4px;display:flex;justify-content:space-between">
+            <span style="font-size:13px;color:var(--txm)">Net (income − bills)</span><span id="net-value" style="font-weight:700;font-size:15px"></span>
+          </div>
+        </div>
+        <div class="card"><div class="sec-title">Alerts</div><div id="alerts-list"></div></div>
+      </div>
+    </div>
+    <div id="page-income" class="page">
+      <div class="page-header"><div class="page-title">Income Sources</div><button class="btn btn-primary" id="add-income-btn">+ Add Income</button></div>
+      <div class="sec-title">Received</div><div id="income-received"></div>
+      <div class="sec-title" style="margin-top:18px">Upcoming / Projected</div><div id="income-upcoming"></div>
+    </div>
+    <div id="page-bills" class="page">
+      <div class="page-header"><div class="page-title">Bills & Expenses</div><button class="btn btn-primary" id="add-bill-btn">+ Add Bill</button></div>
+      <div id="bills-list"></div>
+    </div>
+    <div id="page-allocate" class="page">
+      <div class="page-header"><div class="page-title">Income Allocation</div><div id="alloc-income-bars" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
+      <div class="card" style="margin-bottom:14px">
+        <div class="sec-title">Assign Income → Bill</div>
+        <div class="alloc-grid">
+          <div class="field"><label>Income Source</label><select class="inp" id="alloc-income-sel"><option value="">Select income…</option></select></div>
+          <div class="field"><label>Bill to Cover</label><select class="inp" id="alloc-bill-sel"><option value="">Select bill…</option></select></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-end">
+          <div class="field" style="flex:1"><label>Amount ($ — blank = max)</label><input class="inp" type="number" id="alloc-amount"></div>
+          <button class="btn btn-primary" id="alloc-add-btn">+ Assign</button>
+        </div>
+      </div>
+      <div id="alloc-list"></div>
+    </div>
+    <div id="page-timeline" class="page">
+      <div class="page-title" style="margin-bottom:18px">Cash Flow Timeline</div>
+      <div class="timeline-grid" style="display:grid;grid-template-columns:1fr 240px;gap:16px">
+        <div id="timeline-list" class="timeline-wrap"><div class="t-line"></div></div>
+        <div>
+          <div class="card"><div class="sec-title">Legend</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--tx)">
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Income received</div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>Upcoming income</div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--red);flex-shrink:0"></div>Unpaid bill</div>
+              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--txm);flex-shrink:0"></div>Paid bill</div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:12px"><div class="sec-title">Summary</div><div id="timeline-summary"></div></div>
+          <div class="card" style="margin-top:12px"><div class="sec-title">Sync Info</div><div id="sync-info" style="font-size:12px;color:var(--txm);line-height:1.7"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-overlay"><div id="modal-box">
+  <div id="modal-head"><span id="modal-title"></span><button id="modal-close">×</button></div>
+  <div id="modal-body"></div>
+</div></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  BudgetTool
+//  PUSH: hidden iframe form POST (no CORS, works everywhere)
+//  PULL: JSONP via dynamic <script> tag (no CORS, works everywhere)
+//  Both techniques are universally supported, zero server needed
+// ═══════════════════════════════════════════════════════════════
+
+
+var WEBHOOK = "https://script.google.com/macros/s/AKfycbxFLHOGzuxzbQ8A3rpXtQKQ9yJCAeAwcrYOFGatGMd1VAgJ15Rcp-7HxbhRLHUvk6Vh/exec";
+var fmt=function(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n||0);};
+var fmtD=function(d){try{return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}catch(e){return d;}}; 
+var todayStr=function(){return new Date().toISOString().split("T")[0];};
+var addDays=function(d,n){var dt=new Date(d+"T00:00:00");dt.setDate(dt.getDate()+n);return dt.toISOString().split("T")[0];};
+var uid=function(){return "id_"+Math.random().toString(36).slice(2);};
+var $=function(id){return document.getElementById(id);};
+
+var TD=todayStr();
+var FREQ={weekly:"Weekly",biweekly:"Bi-weekly",monthly:"Monthly",once:"One-time"};
+var CATS=["Housing","Utilities","Food","Transport","Health","Entertainment","Subscriptions","Savings","Other"];
+var CCOL={Housing:"#4f86c6",Utilities:"#7eb8a3",Food:"#c4895e",Transport:"#9175c4",Health:"#c46b7a",Entertainment:"#6ab3c4",Subscriptions:"#a3b86a",Savings:"#6ac47a",Other:"#b0a8a0"};
+
+function getAllCategories(){
+  var base = CATS.slice();
+  var custom = Array.isArray(S.customCategories) ? S.customCategories : [];
+  custom.forEach(function(cat){
+    if(cat && base.indexOf(cat) === -1) base.push(cat);
+  });
+  return base;
+}
+
+function addCustomCategory(name){
+  name = (name || "").trim();
+  if(!name) return null;
+  var existing = getAllCategories();
+  for(var i=0;i<existing.length;i++){
+    if(existing[i].toLowerCase() === name.toLowerCase()) return existing[i];
+  }
+  if(!Array.isArray(S.customCategories)) S.customCategories = [];
+  S.customCategories.push(name);
+  return name;
+}
+
+function getIncomeRemaining(id, s){
+  s = s || stats();
+  var income = S.incomes.find(function(x){ return x.id === id; });
+  if(!income) return 0;
+  return Math.max(0, income.amount - (s.incUsed[id] || 0));
+}
+
+function getBillRemaining(id, s){
+  s = s || stats();
+  var bill = S.bills.find(function(x){ return x.id === id; });
+  if(!bill || bill.paid) return 0;
+  return Math.max(0, bill.amount - (s.billCov[id] || 0));
+}
+
+var S={incomes:[],bills:[],allocations:[],customCategories:[],lastSynced:null,sheetName:"BudgetTool",lastSyncedCell:null};
+var darkMode=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;
+var syncTimer=null;
+var currentTab="dashboard";
+
+function jsonpRequest(params, timeoutMs){
+  return new Promise(function(resolve, reject){
+    var cbName = "btCb_" + Math.random().toString(36).slice(2);
+    var script = document.createElement("script");
+    var done = false;
+    var timeoutId = setTimeout(function(){
+      if(done) return;
+      done = true;
+      cleanup();
+      reject(new Error("Request timed out"));
+    }, timeoutMs || 15000);
+
+    function cleanup(){
+      clearTimeout(timeoutId);
+      try { delete window[cbName]; } catch(e) {}
+      if(script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = function(json){
+      if(done) return;
+      done = true;
+      cleanup();
+      resolve(json);
+    };
+
+    params = params || {};
+    params.callback = cbName;
+    params.t = Date.now().toString();
+
+    var qs = Object.keys(params).map(function(k){
+      return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
+    }).join("&");
+
+    script.src = WEBHOOK + "?" + qs;
+    script.onerror = function(){
+      if(done) return;
+      done = true;
+      cleanup();
+      reject(new Error("Script request failed"));
+    };
+    document.head.appendChild(script);
+  });
+}
+
+function normalizeState(data){
+  data = data || {};
+  if(!Array.isArray(data.incomes)) data.incomes = [];
+  if(!Array.isArray(data.bills)) data.bills = [];
+  if(!Array.isArray(data.allocations)) data.allocations = [];
+  if(!Array.isArray(data.customCategories)) data.customCategories = [];
+  if(!data.lastSynced) data.lastSynced = null;
+  if(!data.sheetName) data.sheetName = "BudgetTool";
+  return data;
+}
+
+function loadFromSheets(){
+  setSyncUI("loading");
+  return jsonpRequest({action:"load"}, 15000).then(function(json){
+    if(json && json.status === "ok" && json.data){
+      S = normalizeState(json.data);
+      S.sheetName = json.sheetName || S.sheetName || "BudgetTool";
+      S.lastSyncedCell = json.lastSyncedCell || null;
+      setSyncUI("idle");
+      renderSyncInfo();
+      return true;
+    }
+    if(json && json.status === "empty"){
+      S = normalizeState({incomes:[],bills:[],allocations:[],lastSynced:null,sheetName:json.sheetName||"BudgetTool",lastSyncedCell:null});
+      setSyncUI("idle");
+      renderSyncInfo();
+      return true;
+    }
+    throw new Error(json && json.message ? json.message : "Load failed");
+  });
+}
+
+function pushSheets(callback){
+  setSyncUI("syncing");
+
+  try {
+    var payload = JSON.stringify({
+      action:"save",
+      incomes:S.incomes,
+      bills:S.bills,
+      allocations:S.allocations,
+      customCategories:S.customCategories,
+      lastSynced:new Date().toISOString()
+    });
+
+    var form = $("sync-form");
+    var frame = $("sync-frame");
+    var finished = false;
+    var timeoutId = null;
+
+    function cleanup(){
+      if(timeoutId) clearTimeout(timeoutId);
+      frame.onload = null;
+    }
+
+    frame.onload = function(){
+      if(finished) return;
+      finished = true;
+      cleanup();
+
+      // Verify by reloading from Google Sheets before declaring success
+      loadFromSheets().then(function(){
+        setSyncUI("idle");
+        render();
+        if(callback) callback(true, {status:"ok", verified:true});
+      }).catch(function(err){
+        console.error("Post-save verification failed:", err);
+        setSyncUI("error");
+        if(callback) callback(false, err);
+      });
+    };
+
+    timeoutId = setTimeout(function(){
+      if(finished) return;
+      finished = true;
+      cleanup();
+      console.error("Sync failed: POST save timed out");
+      setSyncUI("error");
+      if(callback) callback(false, new Error("Save timed out"));
+    }, 20000);
+
+    $("sync-action").value = "save";
+    $("sync-payload").value = payload;
+    form.action = WEBHOOK + "?t=" + Date.now();
+    form.submit();
+
+  } catch(err) {
+    console.error("Sync failed:", err);
+    setSyncUI("error");
+    if(callback) callback(false, err);
+  }
+}
+
+function debounceSync(){
+  if(syncTimer) clearTimeout(syncTimer);
+  syncTimer = setTimeout(function(){ pushSheets(null); }, 1200);
+}
+
+function setSyncUI(s){
+  var bar=$("sync-bar"),icon=$("sync-icon"),txt=$("sync-text");
+  bar.className=s;
+  if(s==="syncing"){icon.textContent="↻";icon.className="spinning";txt.textContent="Syncing to Sheets…";}
+  else if(s==="loading"){icon.textContent="↻";icon.className="spinning";txt.textContent="Loading from Sheets…";}
+  else if(s==="error"){icon.textContent="!";icon.className="";txt.textContent="Sync failed";}
+  else{icon.textContent="✓";icon.className="";txt.textContent=S.lastSynced?"Synced "+new Date(S.lastSynced).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+" (verified)": "Ready";}
+}
+
+function mutate(fn){ fn(S); debounceSync(); render(); }
+function applyTheme(){ document.body.classList.toggle("dark",darkMode); $("theme-btn").textContent=darkMode?"☀️":"🌙"; }
+function switchTab(tab){ currentTab=tab; document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.toggle("active",b.dataset.tab===tab);}); document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("active",p.id==="page-"+tab);}); var sel=$("mobile-tab-select"); if(sel) sel.value=tab; render(); }
+
+function stats(){
+  var inc=S.incomes,bil=S.bills,al=S.allocations;
+  var tI=0,tB=0,pA=0,uA=0,alloc=0,iU={},bC={};
+  for(var i=0;i<inc.length;i++)tI+=inc[i].amount;
+  for(var b=0;b<bil.length;b++){tB+=bil[b].amount;if(bil[b].paid)pA+=bil[b].amount;else uA+=bil[b].amount;}
+  for(var a=0;a<al.length;a++){alloc+=al[a].amount;iU[al[a].incomeId]=(iU[al[a].incomeId]||0)+al[a].amount;bC[al[a].billId]=(bC[al[a].billId]||0)+al[a].amount;}
+  var c7=addDays(TD,7),c30=addDays(TD,30),u7=[],u30=[];
+  for(var b2=0;b2<bil.length;b2++){var bl=bil[b2];if(!bl.paid&&bl.dueDate>=TD&&bl.dueDate<=c7)u7.push(bl);if(!bl.paid&&bl.dueDate>=TD&&bl.dueDate<=c30)u30.push(bl);}
+  var ct={};for(var b3=0;b3<bil.length;b3++)ct[bil[b3].category]=(ct[bil[b3].category]||0)+bil[b3].amount;
+  return{totalIncome:tI,totalBills:tB,paidAmt:pA,unpaidAmt:uA,allocated:alloc,unalloc:tI-alloc,incUsed:iU,billCov:bC,up7:u7,up30:u30,catTotals:ct};
+}
+
+var bdg=function(t,c){return "<span class=\"badge\" style=\"background:"+c+"22;color:"+c+";border:1px solid "+c+"44\">"+t+"</span>";};
+var mbar=function(l,v,mx,c){var p=mx>0?Math.min(100,(v/mx)*100):0;return "<div class=\"mini-bar\"><div class=\"mb-labels\"><span style=\"color:var(--tx)\">"+l+"</span><span style=\"color:var(--txm)\">"+fmt(v)+"</span></div><div class=\"mb-track\"><div class=\"mb-fill\" style=\"background:"+c+";width:"+p+"%\"></div></div></div>";};
+
+function renderDashboard(){
+  var s=stats();
+  var kh="";[["Total Income",s.totalIncome,"var(--green)"],["Total Bills",s.totalBills,"var(--red)"],["Paid",s.paidAmt,"var(--blue)"],["Unpaid",s.unpaidAmt,"var(--orange)"],["Unallocated",s.unalloc,"var(--acc)"]].forEach(function(k){kh+="<div class=\"kpi-card\"><div class=\"kpi-label\">"+k[0]+"</div><div class=\"kpi-value\" style=\"color:"+k[2]+"\">"+fmt(k[1])+"</div></div>";});
+  $("kpi-grid").innerHTML=kh;
+  var uh="";if(!s.up30.length){uh="<p style=\"color:var(--txm);font-size:13px\">No upcoming unpaid bills.</p>";}else{s.up30.forEach(function(ub){var isn=s.up7.some(function(x){return x.id===ub.id;});uh+="<div class=\"row-item\"><div><div style=\"font-weight:600;font-size:13px\">"+ub.name+"</div><div style=\"font-size:11px;color:var(--txm)\">"+fmtD(ub.dueDate)+"</div></div><div style=\"display:flex;gap:7px;align-items:center\">"+(isn?bdg("⚠ Soon","var(--orange)"):"")+"<span style=\"font-weight:700;font-size:13px;color:var(--red)\">"+fmt(ub.amount)+"</span></div></div>";});}
+  $("upcoming-list").innerHTML=uh;
+  var ch="";Object.entries(s.catTotals).sort(function(a,b){return b[1]-a[1];}).forEach(function(e){ch+=mbar(e[0],e[1],s.totalBills||1,CCOL[e[0]]||"#888");});
+  $("cat-bars").innerHTML=ch||"<p style=\"color:var(--txm);font-size:13px\">No bills yet.</p>";
+  $("income-bars").innerHTML=mbar("Income",s.totalIncome,Math.max(s.totalIncome,s.totalBills)||1,"var(--green)")+mbar("Bills",s.totalBills,Math.max(s.totalIncome,s.totalBills)||1,"var(--red)")+mbar("Allocated",s.allocated,s.totalIncome||1,"var(--acc)");
+  var net=s.totalIncome-s.totalBills;$("net-value").textContent=fmt(net);$("net-value").style.color=net>=0?"var(--green)":"var(--red)";
+  var al="";if(!s.up7.length&&s.unalloc<=0&&s.totalBills<=s.totalIncome)al="<p style=\"font-size:13px;color:var(--green)\">✓ No urgent alerts.</p>";
+  s.up7.forEach(function(b){al+="<div style=\"display:flex;gap:8px;padding:8px 10px;margin-bottom:7px;background:rgba(196,142,94,.15);border-radius:7px;border-left:3px solid var(--orange)\"><span>⚠</span><div><div style=\"font-weight:600;font-size:13px\">"+b.name+" due "+fmtD(b.dueDate)+"</div><div style=\"font-size:11px;color:var(--txm)\">"+fmt(b.amount)+"</div></div></div>";});
+  if(s.unalloc>0)al+="<div style=\"display:flex;gap:8px;padding:8px 10px;margin-bottom:7px;background:rgba(106,196,122,.15);border-radius:7px;border-left:3px solid var(--green)\"><span>💡</span><div><div style=\"font-weight:600;font-size:13px\">"+fmt(s.unalloc)+" unallocated</div><div style=\"font-size:11px;color:var(--txm)\">Go to Allocate tab</div></div></div>";
+  if(s.totalBills>s.totalIncome)al+="<div style=\"display:flex;gap:8px;padding:8px 10px;background:rgba(196,107,122,.15);border-radius:7px;border-left:3px solid var(--red)\"><span>🚨</span><div><div style=\"font-weight:600;font-size:13px\">Shortfall: "+fmt(s.totalBills-s.totalIncome)+"</div><div style=\"font-size:11px;color:var(--txm)\">Bills exceed income</div></div></div>";
+  $("alerts-list").innerHTML=al;
+}
+
+function renderIncome(){
+  function ml(list){if(!list.length)return "<p style=\"color:var(--txm);font-size:13px;margin-bottom:8px\">None yet.</p>";var h="";list.forEach(function(i){h+="<div class=\"item-card "+(i.received?"":"upcoming-inc")+"\"><div class=\"row-l\"><div class=\"row-icon\" style=\"background:"+(i.received?"rgba(106,196,122,.18)":"rgba(79,134,198,.18)")+"\">"+(i.received?"💵":"📅")+"</div><div><div style=\"font-weight:700;font-size:14px\">"+i.name+"</div><div style=\"font-size:11px;color:var(--txm)\">"+(FREQ[i.frequency]||i.frequency)+" · "+fmtD(i.nextDate)+"</div></div></div><div class=\"row-r\"><span style=\"font-weight:700;font-size:15px;color:"+(i.received?"var(--green)":"var(--acc)")+"\">"+fmt(i.amount)+"</span>"+(i.received?"<button class=\"btn btn-ghost btn-sm\" onclick=\"togRec('"+i.id+"')\">Mark Upcoming</button>":"<button class=\"btn btn-green btn-sm\" onclick=\"togRec('"+i.id+"')\">✓ Received</button>")+"<button class=\"btn btn-ghost btn-sm\" onclick=\"openIncModal('"+i.id+"')\">Edit</button><button class=\"btn btn-danger btn-sm\" onclick=\"delInc('"+i.id+"')\">Remove</button></div></div>";});return h;}
+  $("income-received").innerHTML=ml(S.incomes.filter(function(i){return i.received;}));
+  $("income-upcoming").innerHTML=ml(S.incomes.filter(function(i){return !i.received;}));
+}
+
+function renderBills(){
+  var s=stats();var html="";
+  getAllCategories().forEach(function(cat){var cb=S.bills.filter(function(b){return b.category===cat;});if(!cb.length)return;var col=CCOL[cat]||"#888";var ct=cb.reduce(function(a,b){return a+b.amount;},0);html+="<div style=\"margin-bottom:20px\"><div style=\"display:flex;align-items:center;gap:8px;margin-bottom:8px\"><div style=\"width:9px;height:9px;border-radius:50%;background:"+col+"\"></div><div class=\"sec-title\" style=\"margin-bottom:0\">"+cat+"</div><span style=\"font-size:12px;color:var(--txm);margin-left:auto\">"+fmt(ct)+"</span></div>";cb.forEach(function(b){var ov=!b.paid&&b.dueDate<TD;var sn=!b.paid&&s.up7.some(function(x){return x.id===b.id;});html+="<div class=\"item-card "+(b.paid?"paid-card":"")+" "+(ov?"overdue":sn?"soon":"")+"\"><div class=\"row-l\"><input type=\"checkbox\" "+(b.paid?"checked":"")+" onchange=\"togPaid('"+b.id+"')\" style=\"width:16px;height:16px;cursor:pointer;accent-color:var(--acc)\"><div><div style=\"font-weight:700;font-size:14px;text-decoration:"+(b.paid?"line-through":"none")+"\">"+b.name+"</div><div style=\"font-size:11px;color:var(--txm)\">Due "+fmtD(b.dueDate)+" · "+(FREQ[b.frequency]||b.frequency)+(ov?" <span style=\"color:var(--red);font-weight:700\">· OVERDUE</span>":sn?" <span style=\"color:var(--orange);font-weight:700\">· Soon</span>":"")+"</div></div></div><div class=\"row-r\"><span style=\"font-weight:700;font-size:14px;color:"+(b.paid?"var(--txm)":"var(--red)")+"\">"+fmt(b.amount)+"</span>"+(b.paid?bdg("Paid","var(--green)"):"")+"<button class=\"btn btn-ghost btn-sm\" onclick=\"openBillModal('"+b.id+"')\">Edit</button><button class=\"btn btn-danger btn-sm\" onclick=\"delBill('"+b.id+"')\">Remove</button></div></div>";});html+="</div>";});
+  $("bills-list").innerHTML=html||"<p style=\"color:var(--txm);font-size:13px\">No bills yet.</p>";
+}
+
+function renderAllocate(){
+  var s=stats();var ib="";
+  S.incomes.forEach(function(i){var used=s.incUsed[i.id]||0;var left=getIncomeRemaining(i.id,s);var pct=i.amount>0?Math.round((used/i.amount)*100):0;ib+="<div class=\"card\" style=\"padding:8px 12px;min-width:130px\"><div style=\"font-size:11px;color:var(--txm);font-weight:700\">"+i.name+"</div><div style=\"font-weight:700;font-size:14px;color:var(--acc);margin-top:2px\">"+fmt(left)+" left</div><div style=\"background:var(--bord);border-radius:3px;height:4px;margin-top:5px\"><div style=\"background:"+(pct>90?"var(--red)":"var(--acc)")+";width:"+Math.min(100,pct)+"%;height:100%;border-radius:3px\"></div></div><div style=\"font-size:10px;color:var(--txm);margin-top:2px\">"+pct+"% allocated</div></div>";});
+  $("alloc-income-bars").innerHTML=ib;
+  var iSel=$("alloc-income-sel"),bSel=$("alloc-bill-sel"),iv=iSel.value,bv=bSel.value;
+  var availableIncomes=S.incomes.filter(function(i){return getIncomeRemaining(i.id,s)>0;});
+  var availableBills=S.bills.filter(function(b){return getBillRemaining(b.id,s)>0;});
+  iSel.innerHTML="<option value=\"\">Select income…</option>"+availableIncomes.map(function(i){return "<option value=\""+i.id+"\""+(iv===i.id?" selected":"")+">"+i.name+" ("+fmt(getIncomeRemaining(i.id,s))+" left)</option>";}).join("");
+  bSel.innerHTML="<option value=\"\">Select bill…</option>"+availableBills.map(function(b){return "<option value=\""+b.id+"\""+(bv===b.id?" selected":"")+">"+b.name+" ("+fmt(getBillRemaining(b.id,s))+" left)</option>";}).join("");
+  if(iv && !availableIncomes.some(function(i){return i.id===iv;})) iSel.value="";
+  if(bv && !availableBills.some(function(b){return b.id===bv;})) bSel.value="";
+  var ah="";if(!S.allocations.length){ah="<p style=\"color:var(--txm);font-size:13px;text-align:center;padding:20px\">No allocations yet.</p>";}else{S.allocations.forEach(function(a){var ai=S.incomes.find(function(x){return x.id===a.incomeId;});var ab=S.bills.find(function(x){return x.id===a.billId;});if(!ai||!ab)return;ah+="<div class=\"alloc-row\"><span style=\"font-size:13px\"><span style=\"font-weight:700;color:var(--acc)\">"+ai.name+"</span><span style=\"color:var(--txm);margin:0 7px\">→</span><span style=\"font-weight:700\">"+ab.name+"</span></span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-weight:700\">"+fmt(a.amount)+"</span><button class=\"rm-btn\" onclick=\"delAlloc('"+a.id+"')\">×</button></div></div>";});}
+  $("alloc-list").innerHTML=ah;
+}
+
+function renderTimeline(){
+  var s=stats();var evs=[];
+  S.incomes.forEach(function(i){evs.push({date:i.nextDate,type:"income",label:i.name,amount:i.amount,received:i.received});});
+  S.bills.forEach(function(b){evs.push({date:b.dueDate,type:"bill",label:b.name,amount:-b.amount,paid:b.paid,category:b.category});});
+  evs.sort(function(a,b){return a.date.localeCompare(b.date);});
+  var bal=0,html="<div class=\"t-line\"></div>";
+  evs.forEach(function(ev){bal+=ev.amount;var past=ev.date<TD,isT=ev.date===TD,short=bal<0,dc=ev.type==="income"?"var(--green)":(ev.paid?"var(--txm)":"var(--red)");html+="<div class=\"t-item\"><div class=\"t-dot\" style=\"background:"+dc+";opacity:"+(past?.5:1)+"\"></div><div class=\"t-card "+(isT?"today":"")+" "+(past?"past":"")+"\"><div class=\"t-row\"><div><div style=\"font-weight:700;font-size:13px\">"+ev.label+"</div><div style=\"font-size:11px;color:var(--txm);margin-top:2px\">"+fmtD(ev.date)+" "+(isT?bdg("Today","var(--acc)"):"")+" "+(ev.type==="income"&&!ev.received?bdg("Projected","var(--orange)"):"")+" "+(ev.type==="bill"&&ev.paid?bdg("Paid","var(--green)"):"")+" "+(ev.type==="bill"&&!ev.paid&&ev.category?bdg(ev.category,CCOL[ev.category]||"#888"):"")+"</div></div><div style=\"text-align:right;flex-shrink:0\"><div style=\"font-weight:700;font-size:14px;color:"+(ev.type==="income"?"var(--green)":"var(--red)")+"\">"+(ev.type==="income"?"+":"-")+fmt(Math.abs(ev.amount))+"</div><div style=\"font-size:11px;color:"+(short?"var(--red)":"var(--txm)")+";font-weight:"+(short?700:400)+"\">bal: "+fmt(bal)+"</div></div></div></div></div>";});
+  $("timeline-list").innerHTML=html;
+  var net=s.totalIncome-s.totalBills;
+  $("timeline-summary").innerHTML="<div style=\"display:flex;justify-content:space-between;margin-bottom:4px\"><span style=\"font-size:13px;color:var(--txm)\">Incoming</span><span style=\"font-weight:700;font-size:14px;color:var(--green)\">"+fmt(s.totalIncome)+"</span></div><div style=\"display:flex;justify-content:space-between;margin-bottom:4px\"><span style=\"font-size:13px;color:var(--txm)\">Outgoing</span><span style=\"font-weight:700;font-size:14px;color:var(--red)\">"+fmt(s.totalBills)+"</span></div><div style=\"display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--bord)\"><span style=\"font-size:13px;color:var(--txm)\">Net</span><span style=\"font-weight:700;font-size:14px;color:"+(net>=0?"var(--green)":"var(--red)")+"\">"+fmt(net)+"</span></div>";
+  renderSyncInfo();
+}
+
+function renderSyncInfo(){$("sync-info").innerHTML="<div>Source of truth: Google Sheets</div>" + "<div>Webhook: Apps Script /exec</div>" + "<div>Sheet: "+(S.sheetName||"BudgetTool")+"</div>" + (S.lastSyncedCell?"<div style=\"margin-top:4px;color:var(--green)\">Sheet B1:<br>"+S.lastSyncedCell+"</div>":"<div>Sheet B1 not available yet</div>") + (S.lastSynced?"<div style=\"margin-top:4px;color:var(--green)\">Last app sync:<br>"+new Date(S.lastSynced).toLocaleString()+"</div>":"<div>Not yet synced</div>");}
+
+function render(){
+  if(currentTab==="dashboard")renderDashboard();
+  else if(currentTab==="income")renderIncome();
+  else if(currentTab==="bills")renderBills();
+  else if(currentTab==="allocate")renderAllocate();
+  else if(currentTab==="timeline")renderTimeline();
+}
+
+var modalCb=null;
+function openModal(t,h,cb){
+  $("modal-title").textContent=t;
+  $("modal-body").innerHTML=h;
+  $("modal-overlay").classList.add("open");
+  modalCb=cb;
+  var catSel=$("fc"),newCatWrap=$("new-cat-wrap"),newCatInput=$("new-cat-input");
+  if(catSel&&newCatWrap){
+    var syncNewCategoryUI=function(){
+      var show=catSel.value==="__new__";
+      newCatWrap.style.display=show?"flex":"none";
+      if(show&&newCatInput)setTimeout(function(){newCatInput.focus();},0);
+      if(!show&&newCatInput)newCatInput.value="";
+    };
+    catSel.addEventListener("change",syncNewCategoryUI);
+    syncNewCategoryUI();
+  }
+  var sb=$("modal-body").querySelector("[data-save]");
+  if(sb)sb.addEventListener("click",function(){if(modalCb&&modalCb())closeModal();});
+}
+function closeModal(){$("modal-overlay").classList.remove("open");$("modal-body").innerHTML="";modalCb=null;}
+
+var iF=function(i){return "<div class=\"form-col\"><div class=\"field\"><label>Source Name</label><input class=\"inp\" id=\"fn\" value=\""+(i.name||"")+"\" placeholder=\"e.g. Primary Job\"></div><div class=\"field\"><label>Amount ($)</label><input class=\"inp\" id=\"fa\" type=\"number\" value=\""+(i.amount||"")+"\"></div><div class=\"field\"><label>Frequency</label><select class=\"inp\" id=\"ff\"><option value=\"weekly\" "+(i.frequency==="weekly"?"selected":"")+">Weekly</option><option value=\"biweekly\" "+(!i.frequency||i.frequency==="biweekly"?"selected":"")+">Bi-weekly</option><option value=\"monthly\" "+(i.frequency==="monthly"?"selected":"")+">Monthly</option><option value=\"once\" "+(i.frequency==="once"?"selected":"")+">One-time</option></select></div><div class=\"field\"><label>Next / Expected Pay Date</label><input class=\"inp\" id=\"fd\" type=\"date\" value=\""+(i.nextDate||TD)+"\"></div><label class=\"cb-row\"><input type=\"checkbox\" id=\"fr\" "+(i.received?"checked":"")+"> Already received</label><div class=\"form-actions\"><button class=\"btn btn-primary\" data-save>Save</button><button class=\"btn btn-ghost\" onclick=\"closeModal()\">Cancel</button></div></div>";};
+var bF=function(b){var selected=b.category||"Housing";var co="";getAllCategories().forEach(function(c){co+="<option value=\""+c+"\" "+(selected===c?"selected":"")+">"+c+"</option>";});co+="<option value=\"__new__\">+ Add new category…</option>";return "<div class=\"form-col\"><div class=\"field\"><label>Bill Name</label><input class=\"inp\" id=\"fn\" value=\""+(b.name||"")+"\" placeholder=\"e.g. Rent\"></div><div class=\"field\"><label>Amount ($)</label><input class=\"inp\" id=\"fa\" type=\"number\" value=\""+(b.amount||"")+"\"></div><div class=\"field\"><label>Due Date</label><input class=\"inp\" id=\"fd\" type=\"date\" value=\""+(b.dueDate||TD)+"\"></div><div class=\"field\"><label>Category</label><select class=\"inp\" id=\"fc\">"+co+"</select></div><div class=\"field\" id=\"new-cat-wrap\" style=\"display:none\"><label>New Category</label><input class=\"inp\" id=\"new-cat-input\" placeholder=\"Enter category name\"></div><div class=\"field\"><label>Recurrence</label><select class=\"inp\" id=\"ff\"><option value=\"once\" "+(!b.frequency||b.frequency==="once"?"selected":"")+">One-time</option><option value=\"weekly\" "+(b.frequency==="weekly"?"selected":"")+">Weekly</option><option value=\"monthly\" "+(b.frequency==="monthly"?"selected":"")+">Monthly</option></select></div><label class=\"cb-row\"><input type=\"checkbox\" id=\"fp\" "+(b.paid?"checked":"")+"> Already paid</label><div class=\"form-actions\"><button class=\"btn btn-primary\" data-save>Save</button><button class=\"btn btn-ghost\" onclick=\"closeModal()\">Cancel</button></div></div>";};
+
+window.openIncModal=function(id){var i=id?S.incomes.find(function(x){return x.id===id;}):{};openModal(id?"Edit Income":"Add Income Source",iF(i||{}),function(){var n=$("fn").value.trim(),a=parseFloat($("fa").value);if(!n||!a)return false;mutate(function(s){var o={id:id||uid(),name:n,amount:a,frequency:$("ff").value,nextDate:$("fd").value,received:$("fr").checked};if(id){for(var i=0;i<s.incomes.length;i++)if(s.incomes[i].id===id){s.incomes[i]=o;break;}}else s.incomes.push(o);});return true;});};
+window.openBillModal=function(id){var b=id?S.bills.find(function(x){return x.id===id;}):{};openModal(id?"Edit Bill":"Add Bill",bF(b||{}),function(){var n=$("fn").value.trim(),a=parseFloat($("fa").value);if(!n||!a)return false;var selectedCategory=$("fc").value;if(selectedCategory==="__new__"){var newCategory=addCustomCategory($("new-cat-input") ? $("new-cat-input").value : "");if(!newCategory)return false;selectedCategory=newCategory;}mutate(function(s){if(!Array.isArray(s.customCategories))s.customCategories=[];if(s.customCategories.indexOf(selectedCategory)===-1&&CATS.indexOf(selectedCategory)===-1){s.customCategories.push(selectedCategory);}var o={id:id||uid(),name:n,amount:a,dueDate:$("fd").value,category:selectedCategory,frequency:$("ff").value,paid:$("fp").checked};if(id){for(var i=0;i<s.bills.length;i++)if(s.bills[i].id===id){s.bills[i]=o;break;}}else s.bills.push(o);});return true;});};
+window.togRec=function(id){mutate(function(s){var i=s.incomes.find(function(x){return x.id===id;});if(i)i.received=!i.received;});};
+window.togPaid=function(id){mutate(function(s){var b=s.bills.find(function(x){return x.id===id;});if(b)b.paid=!b.paid;});};
+window.delInc=function(id){if(!confirm("Remove this income source?"))return;mutate(function(s){s.incomes=s.incomes.filter(function(i){return i.id!==id;});s.allocations=s.allocations.filter(function(a){return a.incomeId!==id;});});};
+window.delBill=function(id){if(!confirm("Remove this bill?"))return;mutate(function(s){s.bills=s.bills.filter(function(b){return b.id!==id;});s.allocations=s.allocations.filter(function(a){return a.billId!==id;});});};
+window.delAlloc=function(id){mutate(function(s){s.allocations=s.allocations.filter(function(a){return a.id!==id;});});};
+window.closeModal=closeModal;
+
+document.querySelectorAll(".tab-btn").forEach(function(b){b.addEventListener("click",function(){switchTab(b.dataset.tab);});});
+var mobileSel=$("mobile-tab-select"); if(mobileSel){mobileSel.addEventListener("change",function(){switchTab(this.value);});}
+$("theme-btn").addEventListener("click",function(){darkMode=!darkMode;applyTheme();});
+$("add-income-btn").addEventListener("click",function(){openIncModal(null);});
+$("add-bill-btn").addEventListener("click",function(){openBillModal(null);});
+$("export-btn").addEventListener("click",function(){var bl=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),url=URL.createObjectURL(bl),a=document.createElement("a");a.href=url;a.download="budget.json";a.click();});
+$("sync-now-btn").addEventListener("click",function(){pushSheets(null);});
+$("modal-overlay").addEventListener("click",function(e){if(e.target===$("modal-overlay"))closeModal();});
+$("modal-close").addEventListener("click",closeModal);
+$("alloc-add-btn").addEventListener("click",function(){
+  var incId=$("alloc-income-sel").value,billId=$("alloc-bill-sel").value;if(!incId||!billId)return;
+  var s=stats();
+  var incomeRemaining=getIncomeRemaining(incId,s);
+  var billRemaining=getBillRemaining(billId,s);
+  var maxAlloc=Math.min(incomeRemaining,billRemaining);
+  var requested=parseFloat($("alloc-amount").value);
+  var amt=$("alloc-amount").value?Math.min(requested,maxAlloc):maxAlloc;
+  if(!isFinite(amt)||amt<=0)return;$("alloc-amount").value="";
+  mutate(function(s){s.allocations.push({id:uid(),incomeId:incId,billId:billId,amount:amt});});
+});
+
+// ── Boot: load from Google Sheets first ──
+(function boot(){
+  applyTheme();
+  setSyncUI("loading");
+  $("load-msg").textContent="Loading your budget from Google Sheets…";
+
+  loadFromSheets().then(function(){
+    $("loading-screen").classList.add("hidden");
+    $("app").style.display="block";
+    setSyncUI("idle");
+    render();
+  }).catch(function(err){
+    console.error("Initial load failed:", err);
+    S = normalizeState({incomes:[],bills:[],allocations:[],lastSynced:null,sheetName:"BudgetTool",lastSyncedCell:null});
+    $("loading-screen").classList.add("hidden");
+    $("app").style.display="block";
+    setSyncUI("error");
+    render();
+    alert("Could not load from Google Sheets. Check your Apps Script deployment URL and permissions.");
+  });
+})();
+</script>
+</body>
+</html>
