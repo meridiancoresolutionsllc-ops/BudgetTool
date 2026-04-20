@@ -3,575 +3,477 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BudgetTool</title>
+<title>DEA-C01 — Mock Exam II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+:root{
+  --bg:#0d0f12;
+  --surface:#13161b;
+  --surface2:#1a1e25;
+  --surface3:#21262f;
+  --border:#2a2f3a;
+  --border2:#343b48;
+  --text:#e8eaf0;
+  --muted:#7a8394;
+  --accent:#f0c040;
+  --accent2:#e88c30;
+  --green:#3fcf8e;
+  --red:#f25c54;
+  --blue:#5b9cf6;
+  --mono:'IBM Plex Mono',monospace;
+  --sans:'IBM Plex Sans',sans-serif;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
-button,input,select{font-family:inherit}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#888;border-radius:3px}
-:root{--bg:#f2f4fa;--card:#fff;--bord:#e0e4ef;--tx:#1a1d27;--txm:#6b7394;--acc:#4f86c6;--inp:#f8f9fd;--green:#6ac47a;--red:#c46b7a;--orange:#c4895e;--blue:#4f86c6}
-body.dark{--bg:#0f1117;--card:#1a1d27;--bord:#2e3248;--tx:#e8eaf6;--txm:#8890b0;--acc:#7eb8a3;--inp:#1e2136}
-#header{background:var(--card);border-bottom:1px solid var(--bord);position:sticky;top:0;z-index:100;padding:0 16px}
-#header-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:54px;gap:8px}
-#body{max-width:1080px;margin:0 auto;padding:20px 14px 60px}
-.logo{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.logo-icon{width:28px;height:28px;border-radius:7px;background:var(--acc);display:flex;align-items:center;justify-content:center}
-.logo-text{font-weight:700;font-size:16px;color:var(--tx)}
-nav{display:flex;gap:2px;overflow:auto}
-.tab-btn{background:none;border:none;padding:7px 12px;cursor:pointer;border-radius:7px;font-size:13px;font-weight:600;color:var(--txm);white-space:nowrap;transition:all .15s}
-.tab-btn.active{color:var(--acc);background:rgba(79,134,198,.15)}
-.mobile-tab-wrap{display:none;min-width:160px}
-.mobile-tab-select{background:var(--card);border:1px solid var(--bord);border-radius:8px;padding:7px 10px;font-size:13px;color:var(--tx);width:100%}
-.header-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:15px 18px}
-.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.1px;color:var(--txm);margin-bottom:10px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
-.kpi-card{background:var(--card);border:1px solid var(--bord);border-radius:12px;padding:12px 10px;text-align:center}
-.kpi-label{font-size:11px;color:var(--txm);font-weight:700;margin-bottom:5px}
-.kpi-value{font-size:18px;font-weight:700}
-.btn{border-radius:7px;padding:7px 15px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:var(--acc);color:#fff;border-color:var(--acc)}
-.btn-ghost{background:transparent;color:var(--txm);border-color:var(--bord)}
-.btn-danger{background:transparent;color:var(--red);border-color:var(--red)}
-.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
-.btn-sm{padding:4px 10px;font-size:12px}
-.field{display:flex;flex-direction:column;gap:4px}
-.field label{font-size:12px;font-weight:600;color:var(--txm)}
-.inp{background:var(--inp);border:1px solid var(--bord);border-radius:7px;padding:7px 11px;font-size:13px;color:var(--tx);outline:none;width:100%}
-.inp:focus{border-color:var(--acc)}
-.form-col{display:flex;flex-direction:column;gap:12px}
-.form-actions{display:flex;gap:8px;margin-top:4px}
-.cb-row{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--tx)}
-.cb-row input{width:16px;height:16px;cursor:pointer;accent-color:var(--acc)}
-.badge{font-size:11px;font-weight:600;border-radius:5px;padding:2px 7px;display:inline-block;white-space:nowrap}
-.mini-bar{margin-bottom:9px}
-.mb-labels{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
-.mb-track{background:var(--bord);border-radius:3px;height:5px;overflow:hidden}
-.mb-fill{height:100%;border-radius:3px;transition:width .4s}
-.row-item{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--bord)}
-.row-item:last-child{border-bottom:none}
-.row-l{display:flex;align-items:center;gap:10px}
-.row-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.row-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.item-card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap}
-.item-card.paid-card{opacity:.62}.item-card.overdue{border-left:3px solid var(--red)}.item-card.soon{border-left:3px solid var(--orange)}.item-card.upcoming-inc{border-left:3px solid var(--acc)}
-.alloc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-.alloc-row{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.rm-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;line-height:1;padding:2px}
-.timeline-wrap{padding-left:22px;position:relative}
-.t-line{position:absolute;left:7px;top:0;bottom:0;width:2px;background:var(--bord)}
-.t-item{position:relative;margin-bottom:16px}
-.t-dot{position:absolute;left:-14px;top:5px;width:13px;height:13px;border-radius:50%;border:2px solid var(--card)}
-.t-card{background:var(--card);border:1px solid var(--bord);border-radius:10px;padding:10px 14px}
-.t-card.today{border-left:3px solid var(--acc)}.t-card.past{opacity:.52}
-.t-row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-#sync-bar{display:flex;align-items:center;gap:7px;font-size:12px;padding:5px 11px;border-radius:8px;font-weight:600;border:1px solid transparent;transition:all .3s}
-#sync-bar.idle{background:rgba(106,196,122,.12);border-color:rgba(106,196,122,.3);color:var(--green)}
-#sync-bar.syncing{background:rgba(79,134,198,.12);border-color:rgba(79,134,198,.3);color:var(--acc)}
-#sync-bar.loading{background:rgba(79,134,198,.12);border-color:rgba(79,134,198,.3);color:var(--acc)}
-#sync-bar.error{background:rgba(196,107,122,.12);border-color:rgba(196,107,122,.3);color:var(--red)}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.spinning{display:inline-block;animation:spin 1s linear infinite}
-#modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:16px}
-#modal-overlay.open{display:flex}
-#modal-box{background:var(--card);border-radius:14px;padding:22px 24px;width:100%;max-width:460px;max-height:90vh;overflow-y:auto}
-#modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-#modal-title{font-weight:700;font-size:17px;color:var(--tx)}
-#modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--txm);line-height:1}
-#loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:200}
-#loading-screen.hidden{display:none}
-.spin-big{font-size:36px;display:inline-block;animation:spin 1s linear infinite}
-.page{display:none}.page.active{display:block}
-.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:10px}
-.page-title{font-size:20px;font-weight:700;color:var(--tx)}
-@media(max-width:640px){.grid-2,.kpi-grid{grid-template-columns:1fr 1fr!important}.alloc-grid{grid-template-columns:1fr!important}.timeline-grid{grid-template-columns:1fr!important}.nav-label{display:inline}nav{display:none}.mobile-tab-wrap{display:block;width:100%}#header-inner{align-items:flex-start}.header-right{width:100%;justify-content:space-between;flex-wrap:wrap}#sync-bar{flex:1 1 auto}}
+html{font-size:15px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+#app{max-width:860px;margin:0 auto;padding:28px 20px 60px}
+
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:20px}
+.timer-wrap{display:flex;flex-direction:column;align-items:flex-end}
+.timer{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent);letter-spacing:2px;transition:color .3s}
+.timer.warn{color:var(--accent2)}
+.timer.danger{color:var(--red);animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:.5}}
+.topbar-meta{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+/* ── PROGRESS ── */
+.prog-track{height:3px;background:var(--border);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s}
+
+/* ── Q-GRID ── */
+.q-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px;margin-bottom:20px}
+.qdot{font-family:var(--mono);font-size:10px;font-weight:600;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .15s}
+.qdot:hover{border-color:var(--border2);color:var(--text)}
+.qdot.done{background:#1f2a1e;border-color:#3fcf8e44;color:var(--green)}
+.qdot.cur{border:1.5px solid var(--accent);color:var(--accent);background:var(--surface2)}
+.qdot.flagged{border-color:var(--accent2);color:var(--accent2)}
+.qdot.r-right{background:#1a2e22;border-color:var(--green);color:var(--green)}
+.qdot.r-wrong{background:#2a1818;border-color:var(--red);color:var(--red)}
+.qdot.r-skip{background:var(--surface);border-color:var(--border);color:var(--muted)}
+
+/* ── QUESTION CARD ── */
+.qcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.domain-tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:#1e1c10;border:1px solid #3a3410;border-radius:4px;padding:3px 10px;margin-bottom:14px}
+.q-meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:8px}
+.q-text{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:20px;font-weight:400}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border:1px solid var(--border);border-radius:7px;cursor:pointer;background:var(--surface2);transition:all .15s}
+.opt:hover:not(.locked){border-color:var(--border2);background:var(--surface3)}
+.opt.sel{border-color:var(--accent);background:#1e1c10}
+.opt.correct{border-color:var(--green);background:#122018}
+.opt.wrong{border-color:var(--red);background:#200e0e}
+.opt.locked{cursor:default}
+.opt-key{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:18px;padding-top:1px}
+.opt.sel .opt-key{color:var(--accent)}
+.opt.correct .opt-key{color:var(--green)}
+.opt.wrong .opt-key{color:var(--red)}
+.opt-txt{font-size:14px;color:var(--text);line-height:1.5}
+
+/* ── EXPLANATION ── */
+.exp-box{display:none;padding:14px 16px;border-radius:7px;background:var(--surface2);border-left:3px solid var(--blue);font-size:13px;line-height:1.7;color:#9eb3cc;margin-bottom:16px}
+.exp-box.show{display:block;animation:fadeUp .2s ease}
+.exp-box b{color:var(--blue)}
+
+/* ── NAV ── */
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.5px;padding:10px 20px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .15s;text-transform:uppercase}
+.btn:hover{border-color:var(--text);color:var(--text)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-accent{border-color:var(--accent);color:var(--accent);background:#1a1800}
+.btn-accent:hover{background:#2a2600;border-color:#f0d060}
+.btn-danger{border-color:#5a2020;color:#c06060}
+.btn-danger:hover{border-color:var(--red);color:var(--red);background:#1a0808}
+.btn-green{border-color:var(--green);color:var(--green);background:#0e1e16}
+.btn-green:hover{background:#162a1e}
+
+/* ── START ── */
+.start-hero{text-align:center;padding:40px 0 32px}
+.start-kicker{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+.start-title{font-size:36px;font-weight:300;color:var(--text);margin-bottom:6px;letter-spacing:-1px}
+.start-title span{font-weight:600;color:var(--accent)}
+.start-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.stat-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--accent)}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:.5px;text-transform:uppercase}
+.domain-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:32px}
+.pill{font-family:var(--mono);font-size:10px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid;letter-spacing:.5px}
+.pill-1{color:#f0c040;border-color:#3a3010;background:#1a1600}
+.pill-2{color:var(--blue);border-color:#1a2840;background:#0e1620}
+.pill-3{color:var(--green);border-color:#0e2a1a;background:#081410}
+.pill-4{color:#d090f0;border-color:#2a1840;background:#140c20}
+.mode-wrap{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.mode-btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:11px 22px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s}
+.mode-btn:hover{border-color:var(--text);color:var(--text)}
+.mode-btn.active{border-color:var(--accent);color:var(--accent);background:#1a1800}
+
+/* ── RESULTS ── */
+.results-top{text-align:center;padding:32px 0 24px}
+.score-ring{width:140px;height:140px;border-radius:50%;margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.score-ring::before{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--border)}
+.score-ring.pass::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--green);clip-path:inset(0)}
+.score-ring.fail::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--red)}
+.score-num{font-family:var(--mono);font-size:42px;font-weight:600}
+.score-num.pass{color:var(--green)}
+.score-num.fail{color:var(--red)}
+.score-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
+.verdict{font-size:22px;font-weight:600;margin-bottom:6px}
+.verdict.pass{color:var(--green)}
+.verdict.fail{color:var(--red)}
+.result-sub{font-size:13px;color:var(--muted);margin-bottom:28px;font-family:var(--mono)}
+.dr-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.dr{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.dr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.dr-name{font-size:12px;color:var(--text);font-weight:500}
+.dr-pct{font-family:var(--mono);font-size:12px;font-weight:600}
+.dr-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.dr-fill{height:100%;border-radius:3px;transition:width .8s ease}
+.results-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* ── REVIEW ── */
+.rev-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:16px}
+.rev-meta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+@media(max-width:540px){
+  .stat-row{grid-template-columns:1fr 1fr}
+  .start-title{font-size:26px}
+  .score-num{font-size:32px}
+  .score-ring{width:110px;height:110px}
+}
 </style>
 </head>
 <body>
+<div id="app">
 
-<div id="loading-screen">
-  <span class="spin-big">↻</span>
-  <div style="color:var(--txm);font-size:14px" id="load-msg">Loading your budget…</div>
+<!-- START -->
+<div id="s-start" class="screen active">
+  <div class="start-hero">
+    <div class="start-kicker">AWS Certification Prep</div>
+    <h1 class="start-title">DEA-C01 <span>Mock Exam II</span></h1>
+    <p class="start-sub">Data Engineer — Associate · Fresh question set · All domains covered</p>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val">65</div><div class="stat-lbl">Questions</div></div>
+      <div class="stat"><div class="stat-val">130</div><div class="stat-lbl">Minutes</div></div>
+      <div class="stat"><div class="stat-val">720</div><div class="stat-lbl">Pass score</div></div>
+      <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Domains</div></div>
+    </div>
+    <div class="domain-pills">
+      <span class="pill pill-1">D1 · Ingestion & Transform · 34%</span>
+      <span class="pill pill-2">D2 · Data Store Mgmt · 26%</span>
+      <span class="pill pill-3">D3 · Operations & Support · 22%</span>
+      <span class="pill pill-4">D4 · Security & Governance · 18%</span>
+    </div>
+    <div class="mode-wrap">
+      <button class="mode-btn active" id="m-timed" onclick="setMode('timed')">⏱ Timed</button>
+      <button class="mode-btn" id="m-practice" onclick="setMode('practice')">◎ Practice</button>
+      <button class="mode-btn" id="m-review" onclick="setMode('review')">✦ Instant Feedback</button>
+    </div>
+    <button class="btn btn-accent" style="font-size:13px;padding:14px 40px" onclick="startExam()">Begin Exam →</button>
+  </div>
 </div>
 
+<!-- EXAM -->
+<div id="s-exam" class="screen">
+  <div class="topbar">
+    <div>
+      <div class="topbar-meta">Question <span id="qc">1</span> / 65 &nbsp;·&nbsp; Answered: <span id="ac">0</span></div>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer" id="timer">2:10:00</div>
+    </div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:1.5%"></div></div>
+  <div id="qgrid" class="q-grid"></div>
+  <div class="qcard">
+    <div id="dtag" class="domain-tag"></div>
+    <div id="qmeta" class="q-meta"></div>
+    <div id="qtext" class="q-text"></div>
+    <div id="opts" class="opts"></div>
+    <div id="expbox" class="exp-box"></div>
+    <div class="nav">
+      <button class="btn" id="pbtn" onclick="go(-1)">← Prev</button>
+      <button class="btn" id="fbtn" onclick="toggleFlag()">⚑ Flag</button>
+      <button class="btn btn-accent" id="nbtn" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-danger" onclick="doSubmit()">Submit Exam</button>
+  </div>
+</div>
 
-<!-- Hidden iframe + form for POST save -->
-<iframe id="sync-frame" name="sync-frame" style="display:none"></iframe>
-<form id="sync-form" method="POST" target="sync-frame" style="display:none">
-  <input type="hidden" id="sync-action" name="action" value="save">
-  <input type="hidden" id="sync-payload" name="payload" value="">
-</form>
-
-<div id="app" style="display:none">
-  <div id="header"><div id="header-inner">
-    <div class="logo">
-      <div class="logo-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-      <span class="logo-text">BudgetTool</span>
-    </div>
-    <nav>
-      <button class="tab-btn active" data-tab="dashboard">⬛ <span class="nav-label">Dashboard</span></button>
-      <button class="tab-btn" data-tab="income">💵 <span class="nav-label">Income</span></button>
-      <button class="tab-btn" data-tab="bills">📋 <span class="nav-label">Bills</span></button>
-      <button class="tab-btn" data-tab="allocate">🔀 <span class="nav-label">Allocate</span></button>
-      <button class="tab-btn" data-tab="timeline">📅 <span class="nav-label">Timeline</span></button>
-    </nav>
-    <div class="mobile-tab-wrap">
-      <select id="mobile-tab-select" class="mobile-tab-select" aria-label="Navigate sections">
-        <option value="dashboard">Dashboard</option>
-        <option value="income">Income</option>
-        <option value="bills">Bills</option>
-        <option value="allocate">Allocate</option>
-        <option value="timeline">Timeline</option>
-      </select>
-    </div>
-    <div class="header-right">
-      <div id="sync-bar" class="idle"><span id="sync-icon">✓</span><span id="sync-text">Not synced yet</span><button class="btn btn-sm" id="sync-now-btn" style="font-size:11px;padding:2px 8px;border-color:currentColor;background:transparent;color:inherit">Sync</button></div>
-      <button class="btn btn-ghost btn-sm" id="export-btn">⬇ JSON</button>
-      <button id="theme-btn" style="background:none;border:1px solid var(--bord);border-radius:7px;padding:4px 8px;cursor:pointer;font-size:14px">🌙</button>
-    </div>
-  </div></div>
-
-  <div id="body">
-    <div id="page-dashboard" class="page active">
-      <div class="kpi-grid" id="kpi-grid"></div>
-      <div class="grid-2">
-        <div class="card"><div class="sec-title">Upcoming Bills — Next 30 Days</div><div id="upcoming-list"></div></div>
-        <div class="card"><div class="sec-title">Spending by Category</div><div id="cat-bars"></div></div>
-        <div class="card"><div class="sec-title">Income vs Expenses</div><div id="income-bars"></div>
-          <div style="border-top:1px solid var(--bord);padding-top:9px;margin-top:4px;display:flex;justify-content:space-between">
-            <span style="font-size:13px;color:var(--txm)">Net (income − bills)</span><span id="net-value" style="font-weight:700;font-size:15px"></span>
-          </div>
-        </div>
-        <div class="card"><div class="sec-title">Alerts</div><div id="alerts-list"></div></div>
+<!-- RESULTS -->
+<div id="s-results" class="screen">
+  <div class="qcard">
+    <div class="results-top">
+      <div class="score-ring" id="sring">
+        <div class="score-num" id="snum">—</div>
+        <div class="score-label">scaled</div>
       </div>
+      <div class="verdict" id="verd"></div>
+      <div class="result-sub" id="rsub"></div>
     </div>
-    <div id="page-income" class="page">
-      <div class="page-header"><div class="page-title">Income Sources</div><button class="btn btn-primary" id="add-income-btn">+ Add Income</button></div>
-      <div class="sec-title">Received</div><div id="income-received"></div>
-      <div class="sec-title" style="margin-top:18px">Upcoming / Projected</div><div id="income-upcoming"></div>
-    </div>
-    <div id="page-bills" class="page">
-      <div class="page-header"><div class="page-title">Bills & Expenses</div><button class="btn btn-primary" id="add-bill-btn">+ Add Bill</button></div>
-      <div id="bills-list"></div>
-    </div>
-    <div id="page-allocate" class="page">
-      <div class="page-header"><div class="page-title">Income Allocation</div><div id="alloc-income-bars" style="display:flex;gap:8px;flex-wrap:wrap"></div></div>
-      <div class="card" style="margin-bottom:14px">
-        <div class="sec-title">Assign Income → Bill</div>
-        <div class="alloc-grid">
-          <div class="field"><label>Income Source</label><select class="inp" id="alloc-income-sel"><option value="">Select income…</option></select></div>
-          <div class="field"><label>Bill to Cover</label><select class="inp" id="alloc-bill-sel"><option value="">Select bill…</option></select></div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:flex-end">
-          <div class="field" style="flex:1"><label>Amount ($ — blank = max)</label><input class="inp" type="number" id="alloc-amount"></div>
-          <button class="btn btn-primary" id="alloc-add-btn">+ Assign</button>
-        </div>
-      </div>
-      <div id="alloc-list"></div>
-    </div>
-    <div id="page-timeline" class="page">
-      <div class="page-title" style="margin-bottom:18px">Cash Flow Timeline</div>
-      <div class="timeline-grid" style="display:grid;grid-template-columns:1fr 240px;gap:16px">
-        <div id="timeline-list" class="timeline-wrap"><div class="t-line"></div></div>
-        <div>
-          <div class="card"><div class="sec-title">Legend</div>
-            <div style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--tx)">
-              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--green);flex-shrink:0"></div>Income received</div>
-              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--orange);flex-shrink:0"></div>Upcoming income</div>
-              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--red);flex-shrink:0"></div>Unpaid bill</div>
-              <div style="display:flex;align-items:center;gap:7px"><div style="width:11px;height:11px;border-radius:50%;background:var(--txm);flex-shrink:0"></div>Paid bill</div>
-            </div>
-          </div>
-          <div class="card" style="margin-top:12px"><div class="sec-title">Summary</div><div id="timeline-summary"></div></div>
-          <div class="card" style="margin-top:12px"><div class="sec-title">Sync Info</div><div id="sync-info" style="font-size:12px;color:var(--txm);line-height:1.7"></div></div>
-        </div>
-      </div>
+    <div class="dr-grid" id="drg"></div>
+    <div class="results-btns">
+      <button class="btn btn-green" onclick="goReview()">Review Answers</button>
+      <button class="btn btn-accent" onclick="resetExam()">Retake Exam</button>
     </div>
   </div>
 </div>
 
-<div id="modal-overlay"><div id="modal-box">
-  <div id="modal-head"><span id="modal-title"></span><button id="modal-close">×</button></div>
-  <div id="modal-body"></div>
-</div></div>
+<!-- REVIEW -->
+<div id="s-review" class="screen">
+  <div class="rev-header">
+    <span class="rev-meta">Review · Q <span id="rvc">1</span>/65</span>
+    <span class="rev-meta" id="rvscr"></span>
+  </div>
+  <div id="rvgrid" class="q-grid"></div>
+  <div class="qcard">
+    <div id="rvdtag" class="domain-tag"></div>
+    <div id="rvmeta" class="q-meta"></div>
+    <div id="rvtext" class="q-text"></div>
+    <div id="rvopts" class="opts"></div>
+    <div id="rvexp" class="exp-box show"></div>
+    <div class="nav">
+      <button class="btn" id="rvpbtn" onclick="rvGo(-1)">← Prev</button>
+      <button class="btn" onclick="showS('s-results')">Results</button>
+      <button class="btn btn-accent" id="rvnbtn" onclick="rvGo(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  BudgetTool
-//  PUSH: hidden iframe form POST (no CORS, works everywhere)
-//  PULL: JSONP via dynamic <script> tag (no CORS, works everywhere)
-//  Both techniques are universally supported, zero server needed
-// ═══════════════════════════════════════════════════════════════
+const DNAMES=['','Data Ingestion & Transform','Data Store Management','Data Operations & Support','Data Security & Governance'];
+const DCOL=['','#f0c040','#5b9cf6','#3fcf8e','#d090f0'];
 
+const Q=[
+  /* ── DOMAIN 1 (22 questions ~34%) ── */
+  {d:1,t:"A company needs to load 200 GB of on-premises CSV files into Amazon S3 each night over a 1 Gbps Direct Connect link. Which AWS service is purpose-built for automating this recurring transfer with bandwidth throttling and scheduling?",o:["AWS DataSync","AWS Snowball Edge","AWS Transfer Family","AWS DMS"],a:0,e:"AWS DataSync is purpose-built for automated data transfers between on-premises storage and AWS. It supports Direct Connect, built-in scheduling, bandwidth throttling, and integrity checks. Snowball is for offline bulk migration."},
+  {d:1,t:"A streaming pipeline on Kinesis Data Streams is falling behind. The GetRecords.IteratorAgeMilliseconds CloudWatch metric is increasing. What does this indicate and what is the most appropriate fix?",o:["Consumers are too fast — reduce Enhanced Fan-Out consumers","Consumers are behind — add more shards or optimize consumer processing","The stream is idle — reduce shard count to save cost","The retention period has expired — extend it to 7 days"],a:1,e:"IteratorAgeMilliseconds measures how far behind consumers are from the tip of the stream. A rising value means consumers cannot keep up. The fix is to add shards (increasing write and read throughput) or optimize consumer code."},
+  {d:1,t:"An ETL process must join two large datasets in AWS Glue — one 500 GB table in S3 and one 2 GB lookup table. The job runs slowly due to data shuffling. Which optimization reduces shuffle overhead for the lookup join?",o:["Use Glue Job Bookmarks","Broadcast the small table using Spark broadcast join hint","Increase the number of Glue DPUs","Convert both tables to ORC format"],a:1,e:"A broadcast join sends the small lookup table (2 GB) to every Spark executor, eliminating the shuffle of the large table across the network. This is the standard optimization for skewed join sizes in Spark/Glue."},
+  {d:1,t:"A company uses AWS Glue to run hourly ETL jobs. The jobs intermittently fail with 'OutOfMemoryError' on specific large partitions. What is the most appropriate fix?",o:["Increase the Glue job timeout","Enable Glue Job Bookmarks","Increase the number of DPUs allocated to the Glue job","Switch from Python Shell to Spark ETL job type"],a:2,e:"Each DPU (Data Processing Unit) provides 4 vCPUs and 16 GB of memory. For jobs failing with OOM errors, increasing DPUs allocates more memory and parallelism to handle large partitions."},
+  {d:1,t:"A Kinesis Data Firehose delivery stream must transform incoming JSON records — adding a derived field — before writing to S3. How is this transformation applied?",o:["Configure a Glue Crawler on the stream","Enable S3 event notification","Associate a Lambda function as a transformation in the Firehose configuration","Use Kinesis Data Analytics on the same stream"],a:2,e:"Kinesis Data Firehose supports inline Lambda transformation. The Lambda function is invoked per micro-batch, processes records, and returns transformed data for delivery. No separate infrastructure is needed."},
+  {d:1,t:"A data team needs to ingest change events from an Amazon RDS MySQL database into a Kinesis Data Stream in near real-time without modifying the application. Which approach captures these changes with minimal impact on the source?",o:["Schedule a Lambda function to run SELECT queries every minute","Enable AWS DMS with CDC replication task pointing to Kinesis","Use AWS Glue JDBC connector with a timestamp watermark","Configure Amazon Aurora read replicas and export binlogs"],a:1,e:"AWS DMS with CDC reads the MySQL binary log (binlog) to capture row-level changes and writes them to Kinesis in near real-time. It has minimal impact on the source because it reads from the binlog, not by querying tables."},
+  {d:1,t:"A company processes clickstream events using EMR Spark Streaming. Some events arrive up to 10 minutes late. The pipeline must include late-arriving events in the correct time window without reprocessing the entire dataset. Which Spark feature handles this?",o:["Checkpointing to S3","Watermarking with event-time windows","Broadcast variables","Dynamic partition pruning"],a:1,e:"Spark Structured Streaming watermarking defines how late data is tolerated. With a 10-minute watermark on event-time, the engine includes events arriving up to 10 minutes late in the correct window before closing it."},
+  {d:1,t:"A company is migrating 15 TB from an on-premises SQL Server to Amazon Redshift. The migration must complete within a 3-day maintenance window with minimal downtime at cutover. Which migration strategy is correct?",o:["Export to CSV, upload to S3, COPY into Redshift","Use AWS DMS full-load task to Redshift directly","Use AWS Snowball to transfer data then DMS CDC for live changes","Use AWS DataSync to copy database files"],a:2,e:"For large migrations (15 TB) with a tight window: Snowball handles the bulk transfer offline (days), then DMS CDC captures changes that occurred during the Snowball transfer, giving a near-zero-downtime cutover."},
+  {d:1,t:"A Glue ETL job reads from an Amazon DynamoDB table and writes to S3 as Parquet. The DynamoDB table has 1 million items. The Glue job is slow because it is reading DynamoDB sequentially. What configuration improves parallel read throughput?",o:["Enable DynamoDB Streams on the source table","Increase the splitType parameter in the DynamoDB connection options to allow parallel segments","Enable Glue Job Bookmarks","Add a Glue Crawler on the DynamoDB table"],a:1,e:"Glue's DynamoDB connector supports the 'dynamodb.splits' option (parallel segments). Increasing segments allows multiple Spark executors to read different portions of the table simultaneously, dramatically improving throughput."},
+  {d:1,t:"A company receives daily partner data files in various formats (CSV, JSON, XML) via SFTP. The files must be ingested into S3 and converted to Parquet. Which AWS service combination handles the SFTP ingestion without managing servers?",o:["AWS Transfer Family + AWS Glue ETL","Amazon Kinesis Firehose + Lambda","AWS DataSync + EMR","EC2 SFTP server + Lambda"],a:0,e:"AWS Transfer Family provides a fully managed SFTP server that writes files directly to S3. AWS Glue ETL then converts the files to Parquet. No EC2 servers need to be managed for either step."},
+  {d:1,t:"A streaming application on Kinesis Data Streams must process each record EXACTLY ONCE even if consumers crash and restart. Which mechanism ensures this guarantee at the consumer level?",o:["Enable Enhanced Fan-Out","Use KCL and implement idempotent processing with DynamoDB checkpointing","Set the stream retention to 7 days","Use Kinesis Data Firehose with S3 deduplication"],a:1,e:"KCL checkpoints the shard iterator position in DynamoDB. If a consumer crashes, it resumes from the last checkpoint. Idempotent processing logic (checking for duplicate record IDs) ensures each record is processed exactly once."},
+  {d:1,t:"A company's AWS Glue job reads a large Parquet dataset from S3. The job is slow and CloudWatch shows most time spent in the Spark planning phase. The dataset has 500,000 small files. What is the best fix?",o:["Enable Glue Job Bookmarks","Use Glue's groupFiles feature to combine small files into larger partitions at read time","Increase DPUs to 100","Switch to a Python Shell job type"],a:1,e:"The 'small file problem' causes excessive Spark task overhead. Glue's groupFiles and groupSize options merge small S3 files into logical groups at read time, reducing the number of Spark tasks and improving throughput."},
+  {d:1,t:"A data engineer must implement a pipeline that processes S3 events as they arrive and invokes a Glue ETL job for each new file. The files arrive irregularly throughout the day. Which is the most event-driven, serverless approach?",o:["Schedule the Glue job every 5 minutes","S3 Event Notification → EventBridge rule → Glue job trigger","S3 Event Notification → SQS → EC2 worker","Lambda polling S3 every minute"],a:1,e:"S3 event notifications can be routed through EventBridge rules which directly trigger Glue jobs. This is fully serverless and event-driven — no polling, no compute to manage, and reacts immediately to each new file."},
+  {d:1,t:"A company uses Amazon MSK. Producers send Avro messages with schemas registered in the AWS Glue Schema Registry. A new producer accidentally sends a message with a field removed, breaking consumers. Which Schema Registry feature prevents this?",o:["Schema versioning with DISABLED compatibility mode","Schema compatibility check set to BACKWARD compatibility","Enable MSK encryption in transit","Use Kinesis Data Streams instead of MSK"],a:1,e:"BACKWARD compatibility means new schemas must be readable by old consumers. Removing a field without a default value would fail the BACKWARD compatibility check at registration, preventing the bad schema from being published."},
+  {d:1,t:"A data pipeline needs to read from 10 different relational database sources (mix of MySQL, PostgreSQL, and Oracle) and consolidate them into a single S3 data lake daily. Which service orchestrates multi-source ingestion with pre-built connectors and no custom JDBC code?",o:["AWS DMS with a single replication instance","Amazon AppFlow","AWS Glue with separate JDBC connections per source","Amazon Kinesis Data Firehose"],a:2,e:"AWS Glue supports JDBC connections to MySQL, PostgreSQL, and Oracle natively. A single Glue ETL job (or multiple jobs orchestrated by a Glue Workflow) can read from all 10 sources using pre-configured JDBC connections."},
+  {d:1,t:"A company uses EMR to process Parquet files. The team notices Spark jobs take 3x longer when reading files with many small partitions vs. fewer large partitions of the same total size. What explains this performance gap?",o:["Parquet is not splittable — large files cannot be processed in parallel","Each small file requires a separate HDFS block read and Spark task, increasing overhead compared to reading fewer large files","EMR does not support Parquet natively","S3 charges more for small file reads"],a:1,e:"Each input file in Spark creates at least one task. Thousands of small files create thousands of tasks with high scheduling overhead. Fewer, larger files reduce task count and per-file metadata overhead, improving job throughput."},
+  {d:1,t:"A real-time fraud detection system receives transactions via Kinesis Data Streams, runs ML scoring in Lambda, and must write results to DynamoDB within 200ms. The Lambda function occasionally times out. What is the most likely cause?",o:["Kinesis shard count is too low","Lambda concurrent execution limit is too low","Lambda cold starts — the function is not initialized","DynamoDB table is in On-Demand mode"],a:1,e:"Lambda has an account-level concurrent execution limit. If many shard-parallel invocations hit the limit simultaneously, new invocations are throttled and queued, causing timeout. Requesting a concurrency limit increase or provisioned concurrency resolves this."},
+  {d:1,t:"A company wants to replicate data from an on-premises Oracle database to Amazon S3 in Parquet format for analytics, with near-real-time latency and no manual schema mapping. Which combination achieves this?",o:["Oracle GoldenGate + S3 manual export","AWS DMS with S3 as target using Parquet output format and CDC","AWS DataSync with format conversion","AWS Glue JDBC job running every minute"],a:1,e:"AWS DMS supports S3 as a target with Parquet output format configured in the S3 endpoint settings. CDC captures ongoing changes. DMS auto-maps the Oracle schema — no manual DDL translation needed."},
+  {d:1,t:"A streaming ETL job using AWS Glue Streaming reads from Kinesis Data Streams. The job must write output to S3 only after accumulating 100 records or 60 seconds, whichever comes first. Which Glue Streaming option controls this micro-batch behavior?",o:["Glue Job Bookmarks","windowSize parameter in the Glue Streaming job configuration","Kinesis shard count configuration","Lambda trigger on the output S3 bucket"],a:1,e:"Glue Streaming jobs use the 'windowSize' option to control the micro-batch interval (e.g., '60 seconds'). For record-count triggers, the Glue script logic handles accumulation. windowSize controls the time-based commit window."},
+  {d:1,t:"A company runs AWS Glue jobs that consume large amounts of S3 API calls due to listing millions of objects before processing. CloudWatch shows 70% of job time is spent on S3 ListObjects calls. What is the most effective optimization?",o:["Enable Glue Job Bookmarks","Partition the S3 data and use partition pushdown in the Glue job to reduce the listing scope","Increase DPUs","Switch to Glue DataBrew"],a:1,e:"Partitioning data (e.g., s3://bucket/year=2024/month=01/) and using pushdown predicates in the Glue job limits the listing scope to only the relevant partitions, dramatically reducing S3 API calls and improving job start time."},
+  {d:1,t:"A data engineering team must implement schema evolution in their data lake. New fields are added to JSON source records over time, and older Parquet files must remain readable alongside newer files. Which approach handles this gracefully?",o:["Rewrite all existing Parquet files whenever the schema changes","Use Avro format with a Schema Registry; configure FORWARD compatibility","Use AWS Glue Data Catalog with schema versioning and Parquet with schema merging enabled in Athena","Delete old files and reload from source"],a:2,e:"Parquet supports schema evolution. With schema merging enabled (in Athena/Glue settings), queries can read files with different but compatible schemas. The Glue Data Catalog stores schema versions for auditing. This avoids rewriting files."},
+  {d:1,t:"A company has a Kinesis Data Stream with 4 shards. A Kinesis Data Firehose delivery stream reads from it and delivers to S3. The team notices S3 objects are very small (average 50 KB). What should be adjusted to produce larger, more efficient S3 files?",o:["Increase Kinesis shard count","Increase the Firehose buffer size (MB) and buffer interval (seconds) settings","Enable Firehose data transformation with Lambda","Switch to direct producer writes to S3"],a:1,e:"Firehose buffers records before writing to S3. The buffer size (1 MB–128 MB) and buffer interval (60s–900s) settings control when a file is flushed. Increasing both produces larger S3 files — better for downstream analytics."},
+  /* ── DOMAIN 2 (17 questions ~26%) ── */
+  {d:2,t:"A data lake team stores data in Amazon S3. Different business units need to read specific tables using Athena, and each unit should only see their own data. The permissions must be manageable without modifying 30 S3 bucket policies. Which model achieves this centrally?",o:["S3 Access Control Lists per prefix","IAM Role per business unit with inline S3 path conditions","AWS Lake Formation table-level and column-level grants per IAM role","S3 Inventory + Lambda enforcement"],a:2,e:"Lake Formation provides a centralized permission model. Table-level and column-level grants are applied to IAM principals without touching bucket policies. Changes apply instantly to all Athena/Glue/Spectrum consumers."},
+  {d:2,t:"A Redshift cluster runs nightly batch loads that take 6 hours using COPY from S3. During this time BI queries slow down. The team wants to isolate BI query performance from ETL loads without adding a second cluster. Which Redshift feature achieves this?",o:["Redshift Spectrum for BI queries","Workload Management (WLM) with separate queues for ETL and BI with memory/concurrency limits","Enable Concurrency Scaling for ETL","Use Redshift Serverless for ETL only"],a:1,e:"WLM allows defining separate queues for ETL and BI workloads with separate memory allocations and concurrency settings. BI queries in the BI queue get their reserved memory regardless of ETL activity."},
+  {d:2,t:"A company stores 5 PB of data in Amazon S3 and needs to run ad-hoc SQL analytics. The team wants to avoid loading data into a separate warehouse. Query performance must be under 30 seconds for most queries. Which optimization strategy for Athena achieves this?",o:["Convert data to CSV and compress with bzip2","Use Parquet format, partition by frequently filtered columns, and use columnar compression (Snappy)","Enable S3 Transfer Acceleration","Enable S3 versioning for data lineage"],a:1,e:"Parquet with partitioning is the single most impactful optimization for Athena. Columnar format reduces bytes scanned, and partitions allow the planner to skip irrelevant data. Snappy balances compression ratio and decompression speed."},
+  {d:2,t:"A company needs a database that stores product catalog data (nested JSON documents) with flexible schema. Queries will search by product attributes that vary by category. Which AWS database service is designed for this?",o:["Amazon Redshift","Amazon RDS MySQL","Amazon DocumentDB","Amazon DynamoDB"],a:2,e:"Amazon DocumentDB is a MongoDB-compatible document database designed for semi-structured JSON data with flexible schemas. It supports rich querying of nested document attributes. DynamoDB also works but DocumentDB is purpose-built for MongoDB-style document queries."},
+  {d:2,t:"A company runs a Redshift cluster and wants to reduce storage costs by compressing existing uncompressed columns. They do not want to reload data. Which Redshift feature analyzes and applies the optimal compression encoding automatically?",o:["VACUUM REINDEX","ANALYZE COMPRESSION + ALTER TABLE ENCODE","DISTKEY reassignment","Redshift Advisor recommendations only"],a:1,e:"ANALYZE COMPRESSION inspects column data and recommends the best encoding. ALTER TABLE ... ENCODE (or encoding during table creation) applies it. For existing data, encoding can also be applied by unloading and reloading, or using ALTER TABLE ENCODE in newer Redshift versions."},
+  {d:2,t:"A DynamoDB table stores financial transactions. Queries always access a single account's transactions sorted by timestamp descending. The table uses account_id as partition key and transaction_id as sort key. How should the sort key be redesigned?",o:["Use transaction_id as the only key — remove the partition key","Use a composite sort key: timestamp#transaction_id to enable sorted range queries by time","Add a Global Secondary Index on timestamp","Keep the current design — DynamoDB sorts by transaction_id automatically"],a:1,e:"DynamoDB sort keys enable range queries. Using timestamp (or a reverse timestamp for descending order) as the sort key — possibly combined with transaction_id for uniqueness — allows efficient 'all transactions for account_id sorted by time' queries."},
+  {d:2,t:"A company's Amazon Aurora MySQL cluster experiences high replication lag on read replicas during large batch write operations. The application reads from replicas. What is the most appropriate solution?",o:["Increase replica instance size","Enable Aurora Global Database","Use Aurora's replica auto-scaling to add more read replicas during lag","Increase the binary log retention period"],a:0,e:"Replication lag is typically caused by the replica's compute being insufficient to apply binlog changes as fast as they are written. Increasing the replica instance class provides more CPU to process replication events, directly reducing lag."},
+  {d:2,t:"A data engineering team needs to query S3 data using SQL from Redshift but the data must stay in S3. They also need the S3 data registered in the Glue Data Catalog. What is the correct service combination?",o:["Amazon Athena + Glue Data Catalog","Amazon Redshift Spectrum + Glue Data Catalog","AWS Glue ETL + Redshift COPY","EMR + Hive Metastore"],a:1,e:"Redshift Spectrum queries S3 data directly from Redshift SQL. It uses the Glue Data Catalog for schema (table definitions). Data stays in S3 — no loading into Redshift is required."},
+  {d:2,t:"A company stores sensor readings in Amazon Timestream. Queries frequently filter by sensor_id and time range for the last 7 days. Older data (>30 days) is rarely accessed. How should Timestream be configured?",o:["Store all data in the memory tier","Configure a magnetic store with 7-day memory retention and 30-day magnetic retention","Enable cross-region replication for disaster recovery","Use a DynamoDB GSI for sensor lookups"],a:1,e:"Timestream has two tiers: memory (fast, expensive) for recent data and magnetic (slow, cheap) for historical data. Setting memory retention to 7 days keeps hot sensor data fast, while data older than 7 days moves to the magnetic store automatically."},
+  {d:2,t:"A company migrated their data warehouse to Amazon Redshift. Analysts run queries joining a 1 TB fact table with a 50 MB product dimension table. Query plans show excessive data redistribution. Which Redshift optimization eliminates this redistribution?",o:["Set DISTKEY on the fact table join column AND set ALL distribution on the dimension table","Add a sort key to the fact table","Enable Concurrency Scaling","Use Redshift Spectrum for the dimension table"],a:0,e:"Setting KEY distribution on the fact table (distributing on the join column) co-locates matching rows on the same node. Setting ALL distribution on the small dimension table copies it to every node. Together, joins happen locally with zero redistribution."},
+  {d:2,t:"A company needs a fully managed, highly available in-memory data store to cache the results of frequent, identical DynamoDB reads. The cache must support automatic expiry of items. Which service and configuration is best?",o:["Amazon ElastiCache for Memcached with manual TTL logic in application","Amazon ElastiCache for Redis with EXPIRE commands per key","DynamoDB DAX (DynamoDB Accelerator)","Amazon RDS with a read-through cache pattern"],a:2,e:"DynamoDB DAX is a purpose-built in-memory cache specifically for DynamoDB. It integrates transparently (same DynamoDB API), supports TTL-based cache invalidation, and provides microsecond latency for cached reads — no application change needed."},
+  {d:2,t:"A company's DynamoDB table has a partition key of 'country' with only 5 distinct values. The table receives millions of writes per second to the 'US' partition, causing throttling. What is the recommended design change?",o:["Add a Global Secondary Index on country","Add a random suffix (1–10) to the partition key to create a write-sharding pattern","Switch to On-Demand capacity mode","Increase the table's WCU to 10 million"],a:1,e:"Write sharding distributes writes across multiple logical partitions by appending a random suffix (e.g., US_1 through US_10). Reads then fan out across these partition key variants. This is the standard DynamoDB hot partition remedy."},
+  {d:2,t:"A company needs to store and query 100 TB of log data. Queries filter by date and service_name. New data arrives daily. Storage cost must be minimized while supporting fast ad-hoc queries. Which approach is optimal?",o:["Load all logs into Amazon Redshift","Store in S3 as Parquet partitioned by date/service_name, query with Athena","Store in DynamoDB with date as partition key","Store in RDS PostgreSQL with table partitioning"],a:1,e:"For 100 TB of log data with ad-hoc query needs: S3 (cheapest storage) + Parquet (columnar, compressed) + Athena (pay-per-scan) + partitioning (skip non-matching dates/services) is the most cost-effective architecture at this scale."},
+  {d:2,t:"A company uses Amazon S3 for their data lake. Different teams should only access their own prefixes. The security team wants to enforce this without managing complex bucket policies for each team. Which S3 feature simplifies this?",o:["S3 Block Public Access","S3 Access Points with per-access-point policies","S3 Versioning","S3 Cross-Region Replication"],a:1,e:"S3 Access Points create named, per-application or per-team access endpoints with their own access policy, hostname, and VPC settings. Each team gets an access point with a policy restricting them to their prefix — no complex shared bucket policy needed."},
+  {d:2,t:"A real-time leaderboard application requires reading the top 100 players by score with sub-millisecond latency. Scores are updated frequently. Which DynamoDB design pattern supports this?",o:["Scan the table for all players and sort in application code","Create a Global Secondary Index with a fixed partition key (e.g., 'LEADERBOARD') and score as the sort key, query in descending order","Use DynamoDB Streams to maintain a separate sorted list in Lambda","Store the leaderboard in S3 and refresh every minute"],a:1,e:"A GSI with a fixed partition key (single-partition GSI) and score as sort key allows querying the top N players in descending order with a Limit parameter. This is the standard DynamoDB leaderboard pattern."},
+  {d:2,t:"A company uses Amazon Redshift. The VACUUM operation is not running frequently enough and query performance is degrading due to unsorted rows and deleted row markers. What is the modern best practice for addressing this?",o:["Run VACUUM FULL manually each week","Enable Redshift Automatic Table Optimization (ATO) which includes automatic VACUUM and ANALYZE","Recreate all tables weekly","Increase cluster node count"],a:1,e:"Redshift's Automatic Table Optimization (ATO) automatically runs VACUUM and ANALYZE in the background during cluster idle time. It eliminates the need for manual scheduling of maintenance operations."},
+  {d:2,t:"A company processes financial records requiring ACID transactions across multiple DynamoDB items in a single request. If one item update fails, all updates must roll back. Which DynamoDB feature provides this?",o:["DynamoDB Streams","DynamoDB Conditional Writes","DynamoDB Transactions (TransactWriteItems)","DynamoDB Global Tables"],a:2,e:"DynamoDB TransactWriteItems groups up to 100 write actions (Put, Update, Delete, ConditionCheck) into a single ACID transaction. If any action fails, all are rolled back atomically — guaranteed consistency across multiple items and tables."},
+  /* ── DOMAIN 3 (14 questions ~22%) ── */
+  {d:3,t:"A data pipeline orchestrated with AWS Step Functions runs 5 parallel EMR jobs. The workflow should wait for ALL jobs to complete before proceeding. If any job fails, the workflow should catch the error and notify SNS. Which Step Functions states implement this?",o:["Map state for parallel execution + Catch block","Parallel state with all branches defined + Catch block at the Parallel state level","5 sequential Task states with error handling","Wait state for each job + Choice state"],a:1,e:"The Parallel state executes multiple branches concurrently and waits for ALL to complete. A Catch block at the Parallel state level catches any branch failure and routes to the SNS notification task — exactly the described pattern."},
+  {d:3,t:"A company's Athena queries consistently fail with 'Query exhausted resources at this scale factor.' The team notices queries scan unpartitioned Parquet files totaling 8 TB. Which TWO actions most directly resolve this?",o:["Add partitions to the S3 data and update the Glue Data Catalog","Convert data from Parquet to JSON for better Athena compatibility","Upgrade the Athena engine version","Use Athena workgroups with per-query byte limits"],a:0,e:"(Multiple answer) Partitioning reduces data scanned by skipping non-matching prefixes. The Athena engine version upgrade improves query planning and resource efficiency. Both directly address the resource exhaustion issue with large unpartitioned datasets."},
+  {d:3,t:"A company uses Amazon QuickSight with SPICE. The underlying Redshift data is updated every hour, but SPICE shows stale data. What is the most automated way to keep SPICE refreshed hourly?",o:["Manually click 'Refresh' in the QuickSight console each hour","Configure a scheduled SPICE refresh in the QuickSight dataset settings","Use Lambda to call the QuickSight API to trigger a refresh every hour","Switch from SPICE to Direct Query mode"],a:1,e:"QuickSight supports scheduled SPICE dataset refreshes (hourly, daily, weekly) configured directly in the dataset settings. This is the simplest, fully automated approach without any Lambda or external tooling."},
+  {d:3,t:"A data team monitors their ETL pipelines with Amazon CloudWatch. They want to detect when a Glue job's execution duration exceeds 2 hours and automatically send an email alert. Which CloudWatch components implement this?",o:["CloudWatch Log Insights query + Lambda","CloudWatch Metric (glue.driver.ExecutorRunTime) + CloudWatch Alarm with SNS action","CloudWatch Dashboard + manual review","CloudTrail event filter + SNS"],a:1,e:"The Glue metric glue.driver.aggregate.elapsedTime tracks job duration. A CloudWatch Alarm on this metric with a threshold of 7,200,000 ms (2 hours) triggers an SNS topic that sends the email — no Lambda needed."},
+  {d:3,t:"A company uses AWS Step Functions to orchestrate a multi-step data pipeline. One step invokes an external REST API that is sometimes slow. The team wants the workflow to retry the API call up to 3 times with a 30-second wait between attempts, then fail gracefully. Which Step Functions configuration achieves this?",o:["Add a Wait state before each Task retry","Configure Retry on the Task state with MaxAttempts=3, IntervalSeconds=30, BackoffRate=1","Use a Map state to call the API 3 times in parallel","Add a Choice state after each API call to check for success"],a:1,e:"Step Functions Retry block on a Task state directly supports MaxAttempts, IntervalSeconds (base wait), and BackoffRate (multiplier). BackoffRate=1 keeps the 30-second interval constant across all retries (no exponential growth)."},
+  {d:3,t:"A data engineering team wants a single SQL-accessible view of data spread across S3, RDS, and DynamoDB for ad-hoc analysis. They do not want to move data. Which service provides this federated query capability?",o:["Amazon Redshift Spectrum","Amazon Athena with Federated Query connectors","AWS Glue with JDBC connections","Amazon QuickSight with multiple data sources"],a:1,e:"Athena Federated Query uses pre-built Lambda connectors for RDS (MySQL, PostgreSQL), DynamoDB, OpenSearch, and many other sources. A single Athena SQL query can JOIN data across S3, RDS, and DynamoDB without moving any data."},
+  {d:3,t:"A company's nightly Glue ETL job processes the same 500 GB S3 dataset repeatedly, but only 2 GB of new data is added each night. The job is slow because it always processes the full 500 GB. What is the most efficient fix without redesigning the pipeline?",o:["Increase Glue DPUs","Enable Glue Job Bookmarks to process only new/modified files","Use Glue DataBrew instead","Partition the S3 data by day and hardcode yesterday's date"],a:1,e:"Glue Job Bookmarks track which files have already been processed. With Bookmarks enabled, the job processes only the 2 GB of new files each night instead of re-reading the full 500 GB — no pipeline redesign needed."},
+  {d:3,t:"A company needs to trigger a data pipeline whenever a new file matching the pattern 'sales_*.csv' is uploaded to a specific S3 prefix. The pipeline consists of multiple steps. Which combination achieves event-driven, serverless triggering with conditional file matching?",o:["S3 lifecycle rule + Lambda","S3 Event Notification → EventBridge → EventBridge rule with pattern filter → Step Functions","CloudWatch cron + Lambda → S3 listing","S3 Inventory report + Glue trigger"],a:1,e:"S3 events flow through EventBridge. An EventBridge rule with an event pattern filter (matching the key prefix and suffix) conditionally triggers a Step Functions execution only for matching files — serverless and event-driven."},
+  {d:3,t:"A company runs Amazon Athena queries that often scan too much data, costing thousands of dollars per month. The data governance team wants to enforce a per-query scan limit of 5 GB across all analysts. Which mechanism enforces this?",o:["IAM policy with S3 GetObject size conditions","Athena Workgroup setting: BytesScannedCutoffPerQuery = 5368709120","CloudWatch Alarm on BytesScanned metric","Lambda interceptor before Athena API calls"],a:1,e:"Athena Workgroups support BytesScannedCutoffPerQuery. Setting it to 5 GB (5,368,709,120 bytes) automatically cancels any query that would exceed this scan limit before it completes, enforcing the cost guardrail."},
+  {d:3,t:"A data team uses AWS Glue Data Quality to validate records in a nightly ETL job. They want the job to succeed but write all failing records to a separate S3 'quarantine' bucket for manual review, without failing the entire job. How is this configured?",o:["Set the DQ action to FAIL — review CloudWatch logs for failed records","Set the DQ action to WARN, capture the failed records using the DQ result frame, and write them to the quarantine S3 path in the Glue script","Use a separate Glue job to validate after the main job","Configure CloudWatch Alarms on DQ metric failures"],a:1,e:"Glue Data Quality in WARN mode continues the job without failing it. The DQ result DynamicFrame contains the failed records. The Glue script can write these to a quarantine S3 path while passing clean records downstream."},
+  {d:3,t:"A data platform team monitors 50 Glue jobs and wants a single operational dashboard showing job success/failure rates, duration trends, and DPU utilization over the past 7 days. Which AWS tool provides this most directly?",o:["AWS CloudTrail Lake queries","Amazon CloudWatch Dashboard with Glue metrics widgets","AWS Config dashboard","Glue job run history UI only"],a:1,e:"CloudWatch Dashboards support custom widgets for any CloudWatch metric. Glue publishes job-level metrics (success/failure count, duration, DPU consumption). A CloudWatch Dashboard aggregates all 50 jobs into a single operational view with configurable time ranges."},
+  {d:3,t:"A company uses MWAA (Managed Apache Airflow) to orchestrate data pipelines. DAG files are stored in S3. After a deployment, one DAG is broken and is causing the Airflow scheduler to crash repeatedly. What is the fastest way to disable the broken DAG without redeploying?",o:["Delete the MWAA environment and recreate it","Set the DAG's 'is_paused_upon_creation' flag in the DAG file and redeploy","Pause the DAG using the Airflow UI or CLI — set the DAG to paused state","Modify the MWAA environment's S3 bucket policy to block the DAG file"],a:2,e:"The Airflow UI (or CLI) allows pausing a DAG instantly without any redeployment. A paused DAG's tasks stop being scheduled immediately, stopping the crash cycle while the team fixes the broken DAG file."},
+  {d:3,t:"A company uses Amazon OpenSearch Service for log analytics. Ingestion pipelines write logs via Kinesis Data Firehose. The team notices search latency increases as the index grows beyond 30 billion documents. What is the best long-term architecture improvement?",o:["Add more Kinesis shards","Implement Index Lifecycle Management (ILM) — use hot/warm/cold node tiers and roll over indices at a size threshold","Increase the Firehose buffer interval","Use a larger OpenSearch master node"],a:1,e:"OpenSearch ISM (Index State Management) / ILM automates rolling over indices when they reach a size threshold. Hot nodes handle recent active data; warm/cold nodes serve older, less-queried data at lower cost. This prevents unbounded index growth."},
+  {d:3,t:"A Glue ETL job uses a Python script that performs complex business logic that is difficult to parallelize. The script must process 10 million records. The team wants the fastest possible execution. Which Glue job type and configuration is best?",o:["Python Shell job with 1 DPU","Glue Spark ETL job with G.2X workers — use Spark's mapPartitions to apply the Python logic per partition in parallel","Glue DataBrew job","AWS Lambda — process records in parallel with multiple invocations"],a:1,e:"Glue Spark ETL with G.2X workers (8 vCPUs, 32 GB each) can partition 10M records across many executors. Using mapPartitions applies the Python logic within each partition in parallel across the cluster — dramatically faster than a single Python Shell process."},
+  /* ── DOMAIN 4 (12 questions ~18%) ── */
+  {d:4,t:"A company uses S3 to store PII data. A data engineer accidentally made an S3 bucket public. Which AWS service would automatically detect this misconfiguration and alert the security team?",o:["AWS CloudTrail","Amazon Macie","AWS Config with the 's3-bucket-public-read-prohibited' managed rule","Amazon GuardDuty"],a:2,e:"AWS Config's 's3-bucket-public-read-prohibited' and 's3-bucket-public-write-prohibited' managed rules continuously evaluate all S3 buckets and flag any bucket that has public access enabled, triggering an SNS alert."},
+  {d:4,t:"A data lake uses AWS Lake Formation. A new analyst IAM role needs SELECT access to a specific table but only to columns that do NOT contain PII. The PII columns (ssn, dob) must be completely hidden. Which Lake Formation feature achieves this?",o:["Deny IAM policy on the PII columns","Lake Formation column-level permission grant — explicitly grant only non-PII columns, omit ssn and dob","S3 bucket policy restricting the analyst role to non-PII prefixes","Create a Glue view that excludes PII columns"],a:1,e:"Lake Formation supports column-level grants. Granting SELECT on only the non-PII columns (omitting ssn and dob from the grant) means the analyst can only see and query those columns when using Athena or Glue — PII columns are invisible."},
+  {d:4,t:"A company must implement end-to-end encryption for data flowing from Kinesis Data Streams to S3 via Kinesis Data Firehose. Both the stream and the S3 objects must be encrypted using a customer-managed KMS key. Which configurations are required?",o:["Enable SSE-KMS on the Kinesis stream with the CMK AND configure the Firehose S3 destination with SSE-KMS using the same CMK","Enable SSE-S3 on S3 and TLS for Kinesis — no KMS config needed","Use client-side encryption in the producer only","Enable Kinesis default encryption only"],a:0,e:"Both the Kinesis stream and the Firehose S3 destination must independently be configured with SSE-KMS using the customer-managed key. Each encrypts data at rest at its layer — the stream (in-flight storage) and S3 (output files)."},
+  {d:4,t:"A company's data platform uses multiple AWS accounts (dev, staging, prod). The security team must prevent any account from creating unencrypted S3 buckets across the entire organization. Which mechanism enforces this at scale?",o:["Apply an S3 bucket policy on every bucket in every account","Create an IAM policy in every account denying s3:CreateBucket without encryption","Create an SCP (Service Control Policy) in AWS Organizations denying s3:CreateBucket when 'aws:RequestedRegion' is not encrypted","Create an SCP denying s3:PutBucketEncryption and requiring s3:CreateBucket to have an encrypted header using an IAM condition"],a:3,e:"An SCP in AWS Organizations with a condition on the s3:CreateBucket action requiring the x-amz-server-side-encryption header (or denying CreateBucket without it) enforces encrypted bucket creation across ALL accounts in the organization automatically."},
+  {d:4,t:"A security team discovers that an IAM role used by a Glue ETL job has been granted s3:* on all S3 buckets. They want to minimize the blast radius by restricting the role to only the specific buckets it needs. Which IAM concept applies?",o:["Permission boundary","Principle of Least Privilege — update the role policy to specify exact bucket ARNs and required actions only","Service Control Policy","IAM Access Analyzer"],a:1,e:"The principle of least privilege means granting only the exact permissions needed. Replacing s3:* on * with specific actions (s3:GetObject, s3:PutObject) on specific bucket ARNs (arn:aws:s3:::my-bucket/*) minimizes exposure."},
+  {d:4,t:"A company's Redshift cluster processes sensitive financial data. The security team requires that all queries that access salary columns be logged with the query text and user identity. Which Redshift feature provides this query-level audit logging?",o:["Enable CloudTrail data events for Redshift","Enable Redshift audit logging to S3 and query the user activity log","Use Amazon Macie on the Redshift cluster","Enable CloudWatch detailed monitoring"],a:1,e:"Redshift audit logging (enabled in cluster settings) writes connection log, user log, and user activity log to S3. The user activity log captures the full query text and executing user, enabling query-level auditing of sensitive data access."},
+  {d:4,t:"A company stores encryption keys in AWS KMS. A Glue ETL job running in a VPC must call KMS to decrypt data but the VPC has no internet access. How does the Glue job reach KMS?",o:["Enable NAT Gateway for internet access","Create a KMS Interface VPC Endpoint (PrivateLink) in the VPC","Use an S3 Gateway Endpoint for KMS access","Store the decryption key in Secrets Manager instead"],a:1,e:"KMS does not have a Gateway Endpoint. An Interface VPC Endpoint (PrivateLink) for KMS creates a private DNS-resolved endpoint within the VPC, allowing the Glue job to call KMS API without internet access."},
+  {d:4,t:"A data engineering team uses AWS Secrets Manager to store database credentials. A Glue ETL job must rotate credentials automatically every 30 days without any code changes to the job. Which Secrets Manager feature provides this?",o:["Lambda function scheduled by EventBridge every 30 days","Secrets Manager automatic rotation with a rotation Lambda function","Store credentials in Parameter Store with manual updates","Use IAM roles instead of credentials"],a:1,e:"Secrets Manager supports automatic rotation via a configurable rotation schedule (e.g., every 30 days). Secrets Manager invokes a rotation Lambda (pre-built for RDS engines) that generates new credentials and updates both the secret and the database — transparently."},
+  {d:4,t:"A company is building a multi-tenant data platform on AWS. Each tenant's data must be isolated so that one tenant's query in Athena cannot access another tenant's data, even if they share the same S3 bucket. Which Lake Formation feature provides tenant isolation at query time?",o:["S3 bucket per tenant","IAM role per tenant with S3 path conditions","Lake Formation row-level filters scoped per IAM role","VPC per tenant"],a:2,e:"Lake Formation row-level filters define which rows a given IAM principal can see. Each tenant's IAM role is granted a filter that restricts rows to their tenant_id. At query time, Athena automatically applies the filter — no application-level enforcement needed."},
+  {d:4,t:"A company must log every time an SSE-KMS encrypted S3 object is accessed (decrypted). Standard CloudTrail management events do not capture this. What must be enabled?",o:["CloudTrail data events for S3 with 'ReadEvents' selected","Enable S3 server access logging","Enable CloudTrail Insights","Enable AWS Config S3 object-level recording"],a:0,e:"CloudTrail Data Events for S3 (specifically Read events) capture GetObject API calls, which trigger KMS Decrypt calls. Enabling S3 Data Events provides the per-object access audit trail including the user identity and timestamp."},
+  {d:4,t:"A company uses AWS IAM Identity Center (SSO) to manage access to multiple AWS accounts. A data engineer needs read-only access to S3 and Athena in the production account but full access in the development account. How is this configured?",o:["Create 2 IAM users — one per account","Create 2 Permission Sets in IAM Identity Center — one per access level — and assign each to the engineer for the appropriate account","Use a single IAM role with condition keys per account","Hardcode credentials per account in the application"],a:1,e:"IAM Identity Center Permission Sets define the access level (like IAM policies). Assigning a 'DataEngineer-ReadOnly' permission set to the prod account and 'DataEngineer-FullAccess' to the dev account gives the correct per-account permissions through a single SSO portal."},
+  {d:4,t:"A data pipeline writes to S3 and must comply with a regulation requiring that objects cannot be deleted or overwritten for 7 years. No one — including the AWS root account — must be able to delete the data. Which S3 feature provides this guarantee?",o:["S3 Versioning with lifecycle rules","S3 Object Lock in COMPLIANCE mode with a 7-year retention period","S3 MFA Delete","S3 Replication to a separate account"],a:1,e:"S3 Object Lock in COMPLIANCE mode sets a retention period that cannot be shortened or overridden by ANY user — including the root account and AWS Support. It provides a legally defensible write-once-read-many (WORM) guarantee for the specified retention period."},
+];
 
-var WEBHOOK = "https://script.google.com/macros/s/AKfycbxFLHOGzuxzbQ8A3rpXtQKQ9yJCAeAwcrYOFGatGMd1VAgJ15Rcp-7HxbhRLHUvk6Vh/exec";
-var fmt=function(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n||0);};
-var fmtD=function(d){try{return new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});}catch(e){return d;}}; 
-var todayStr=function(){return new Date().toISOString().split("T")[0];};
-var addDays=function(d,n){var dt=new Date(d+"T00:00:00");dt.setDate(dt.getDate()+n);return dt.toISOString().split("T")[0];};
-var uid=function(){return "id_"+Math.random().toString(36).slice(2);};
-var $=function(id){return document.getElementById(id);};
+let mode='timed',curQ=0,ans=new Array(65).fill(null),flags=new Set(),ti=null,tLeft=130*60,done=false,rvQ=0;
 
-var TD=todayStr();
-var FREQ={weekly:"Weekly",biweekly:"Bi-weekly",monthly:"Monthly",once:"One-time"};
-var CATS=["Housing","Utilities","Food","Transport","Health","Entertainment","Subscriptions","Savings","Other"];
-var CCOL={Housing:"#4f86c6",Utilities:"#7eb8a3",Food:"#c4895e",Transport:"#9175c4",Health:"#c46b7a",Entertainment:"#6ab3c4",Subscriptions:"#a3b86a",Savings:"#6ac47a",Other:"#b0a8a0"};
-
-function getAllCategories(){
-  var base = CATS.slice();
-  var custom = Array.isArray(S.customCategories) ? S.customCategories : [];
-  custom.forEach(function(cat){
-    if(cat && base.indexOf(cat) === -1) base.push(cat);
-  });
-  return base;
+function setMode(m){
+  mode=m;
+  ['timed','practice','review'].forEach(x=>{document.getElementById('m-'+x).classList.toggle('active',x===m)});
 }
 
-function addCustomCategory(name){
-  name = (name || "").trim();
-  if(!name) return null;
-  var existing = getAllCategories();
-  for(var i=0;i<existing.length;i++){
-    if(existing[i].toLowerCase() === name.toLowerCase()) return existing[i];
-  }
-  if(!Array.isArray(S.customCategories)) S.customCategories = [];
-  S.customCategories.push(name);
-  return name;
+function showS(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function getIncomeRemaining(id, s){
-  s = s || stats();
-  var income = S.incomes.find(function(x){ return x.id === id; });
-  if(!income) return 0;
-  return Math.max(0, income.amount - (s.incUsed[id] || 0));
+function startExam(){
+  ans=new Array(65).fill(null);flags=new Set();curQ=0;done=false;tLeft=130*60;
+  buildGrid('qgrid');renderQ();showS('s-exam');
+  if(mode==='timed')startTimer();
+  else document.getElementById('timer').textContent='◎ No Limit';
 }
 
-function getBillRemaining(id, s){
-  s = s || stats();
-  var bill = S.bills.find(function(x){ return x.id === id; });
-  if(!bill || bill.paid) return 0;
-  return Math.max(0, bill.amount - (s.billCov[id] || 0));
+function startTimer(){
+  clearInterval(ti);
+  ti=setInterval(()=>{
+    tLeft--;
+    const h=Math.floor(tLeft/3600),m=Math.floor((tLeft%3600)/60),s=tLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    el.className='timer'+(tLeft<300?' danger':tLeft<900?' warn':'');
+    if(tLeft<=0){clearInterval(ti);doSubmit();}
+  },1000);
 }
 
-var S={incomes:[],bills:[],allocations:[],customCategories:[],lastSynced:null,sheetName:"BudgetTool",lastSyncedCell:null};
-var darkMode=window.matchMedia&&window.matchMedia("(prefers-color-scheme:dark)").matches;
-var syncTimer=null;
-var currentTab="dashboard";
-
-function jsonpRequest(params, timeoutMs){
-  return new Promise(function(resolve, reject){
-    var cbName = "btCb_" + Math.random().toString(36).slice(2);
-    var script = document.createElement("script");
-    var done = false;
-    var timeoutId = setTimeout(function(){
-      if(done) return;
-      done = true;
-      cleanup();
-      reject(new Error("Request timed out"));
-    }, timeoutMs || 15000);
-
-    function cleanup(){
-      clearTimeout(timeoutId);
-      try { delete window[cbName]; } catch(e) {}
-      if(script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    window[cbName] = function(json){
-      if(done) return;
-      done = true;
-      cleanup();
-      resolve(json);
-    };
-
-    params = params || {};
-    params.callback = cbName;
-    params.t = Date.now().toString();
-
-    var qs = Object.keys(params).map(function(k){
-      return encodeURIComponent(k) + "=" + encodeURIComponent(params[k]);
-    }).join("&");
-
-    script.src = WEBHOOK + "?" + qs;
-    script.onerror = function(){
-      if(done) return;
-      done = true;
-      cleanup();
-      reject(new Error("Script request failed"));
-    };
-    document.head.appendChild(script);
-  });
-}
-
-function normalizeState(data){
-  data = data || {};
-  if(!Array.isArray(data.incomes)) data.incomes = [];
-  if(!Array.isArray(data.bills)) data.bills = [];
-  if(!Array.isArray(data.allocations)) data.allocations = [];
-  if(!Array.isArray(data.customCategories)) data.customCategories = [];
-  if(!data.lastSynced) data.lastSynced = null;
-  if(!data.sheetName) data.sheetName = "BudgetTool";
-  return data;
-}
-
-function loadFromSheets(){
-  setSyncUI("loading");
-  return jsonpRequest({action:"load"}, 15000).then(function(json){
-    if(json && json.status === "ok" && json.data){
-      S = normalizeState(json.data);
-      S.sheetName = json.sheetName || S.sheetName || "BudgetTool";
-      S.lastSyncedCell = json.lastSyncedCell || null;
-      setSyncUI("idle");
-      renderSyncInfo();
-      return true;
-    }
-    if(json && json.status === "empty"){
-      S = normalizeState({incomes:[],bills:[],allocations:[],lastSynced:null,sheetName:json.sheetName||"BudgetTool",lastSyncedCell:null});
-      setSyncUI("idle");
-      renderSyncInfo();
-      return true;
-    }
-    throw new Error(json && json.message ? json.message : "Load failed");
+function buildGrid(gid){
+  const g=document.getElementById(gid);g.innerHTML='';
+  const rv=gid==='rvgrid';
+  const cur=rv?rvQ:curQ;
+  Q.forEach((_,i)=>{
+    const d=document.createElement('div');
+    let c='qdot';
+    if(i===cur)c+=' cur';
+    if(rv){c+=ans[i]===Q[i].a?' r-right':ans[i]!==null?' r-wrong':' r-skip';}
+    else{if(ans[i]!==null)c+=' done';if(flags.has(i))c+=' flagged';}
+    d.className=c;d.textContent=i+1;
+    d.onclick=()=>{if(rv){rvQ=i;renderRev();}else{curQ=i;renderQ();}};
+    g.appendChild(d);
   });
 }
 
-function pushSheets(callback){
-  setSyncUI("syncing");
-
-  try {
-    var payload = JSON.stringify({
-      action:"save",
-      incomes:S.incomes,
-      bills:S.bills,
-      allocations:S.allocations,
-      customCategories:S.customCategories,
-      lastSynced:new Date().toISOString()
-    });
-
-    var form = $("sync-form");
-    var frame = $("sync-frame");
-    var finished = false;
-    var timeoutId = null;
-
-    function cleanup(){
-      if(timeoutId) clearTimeout(timeoutId);
-      frame.onload = null;
-    }
-
-    frame.onload = function(){
-      if(finished) return;
-      finished = true;
-      cleanup();
-
-      // Verify by reloading from Google Sheets before declaring success
-      loadFromSheets().then(function(){
-        setSyncUI("idle");
-        render();
-        if(callback) callback(true, {status:"ok", verified:true});
-      }).catch(function(err){
-        console.error("Post-save verification failed:", err);
-        setSyncUI("error");
-        if(callback) callback(false, err);
-      });
-    };
-
-    timeoutId = setTimeout(function(){
-      if(finished) return;
-      finished = true;
-      cleanup();
-      console.error("Sync failed: POST save timed out");
-      setSyncUI("error");
-      if(callback) callback(false, new Error("Save timed out"));
-    }, 20000);
-
-    $("sync-action").value = "save";
-    $("sync-payload").value = payload;
-    form.action = WEBHOOK + "?t=" + Date.now();
-    form.submit();
-
-  } catch(err) {
-    console.error("Sync failed:", err);
-    setSyncUI("error");
-    if(callback) callback(false, err);
-  }
-}
-
-function debounceSync(){
-  if(syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(function(){ pushSheets(null); }, 1200);
-}
-
-function setSyncUI(s){
-  var bar=$("sync-bar"),icon=$("sync-icon"),txt=$("sync-text");
-  bar.className=s;
-  if(s==="syncing"){icon.textContent="↻";icon.className="spinning";txt.textContent="Syncing to Sheets…";}
-  else if(s==="loading"){icon.textContent="↻";icon.className="spinning";txt.textContent="Loading from Sheets…";}
-  else if(s==="error"){icon.textContent="!";icon.className="";txt.textContent="Sync failed";}
-  else{icon.textContent="✓";icon.className="";txt.textContent=S.lastSynced?"Synced "+new Date(S.lastSynced).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+" (verified)": "Ready";}
-}
-
-function mutate(fn){ fn(S); debounceSync(); render(); }
-function applyTheme(){ document.body.classList.toggle("dark",darkMode); $("theme-btn").textContent=darkMode?"☀️":"🌙"; }
-function switchTab(tab){ currentTab=tab; document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.toggle("active",b.dataset.tab===tab);}); document.querySelectorAll(".page").forEach(function(p){p.classList.toggle("active",p.id==="page-"+tab);}); var sel=$("mobile-tab-select"); if(sel) sel.value=tab; render(); }
-
-function stats(){
-  var inc=S.incomes,bil=S.bills,al=S.allocations;
-  var tI=0,tB=0,pA=0,uA=0,alloc=0,iU={},bC={};
-  for(var i=0;i<inc.length;i++)tI+=inc[i].amount;
-  for(var b=0;b<bil.length;b++){tB+=bil[b].amount;if(bil[b].paid)pA+=bil[b].amount;else uA+=bil[b].amount;}
-  for(var a=0;a<al.length;a++){alloc+=al[a].amount;iU[al[a].incomeId]=(iU[al[a].incomeId]||0)+al[a].amount;bC[al[a].billId]=(bC[al[a].billId]||0)+al[a].amount;}
-  var c7=addDays(TD,7),c30=addDays(TD,30),u7=[],u30=[];
-  for(var b2=0;b2<bil.length;b2++){var bl=bil[b2];if(!bl.paid&&bl.dueDate>=TD&&bl.dueDate<=c7)u7.push(bl);if(!bl.paid&&bl.dueDate>=TD&&bl.dueDate<=c30)u30.push(bl);}
-  var ct={};for(var b3=0;b3<bil.length;b3++)ct[bil[b3].category]=(ct[bil[b3].category]||0)+bil[b3].amount;
-  return{totalIncome:tI,totalBills:tB,paidAmt:pA,unpaidAmt:uA,allocated:alloc,unalloc:tI-alloc,incUsed:iU,billCov:bC,up7:u7,up30:u30,catTotals:ct};
-}
-
-var bdg=function(t,c){return "<span class=\"badge\" style=\"background:"+c+"22;color:"+c+";border:1px solid "+c+"44\">"+t+"</span>";};
-var mbar=function(l,v,mx,c){var p=mx>0?Math.min(100,(v/mx)*100):0;return "<div class=\"mini-bar\"><div class=\"mb-labels\"><span style=\"color:var(--tx)\">"+l+"</span><span style=\"color:var(--txm)\">"+fmt(v)+"</span></div><div class=\"mb-track\"><div class=\"mb-fill\" style=\"background:"+c+";width:"+p+"%\"></div></div></div>";};
-
-function renderDashboard(){
-  var s=stats();
-  var kh="";[["Total Income",s.totalIncome,"var(--green)"],["Total Bills",s.totalBills,"var(--red)"],["Paid",s.paidAmt,"var(--blue)"],["Unpaid",s.unpaidAmt,"var(--orange)"],["Unallocated",s.unalloc,"var(--acc)"]].forEach(function(k){kh+="<div class=\"kpi-card\"><div class=\"kpi-label\">"+k[0]+"</div><div class=\"kpi-value\" style=\"color:"+k[2]+"\">"+fmt(k[1])+"</div></div>";});
-  $("kpi-grid").innerHTML=kh;
-  var uh="";if(!s.up30.length){uh="<p style=\"color:var(--txm);font-size:13px\">No upcoming unpaid bills.</p>";}else{s.up30.forEach(function(ub){var isn=s.up7.some(function(x){return x.id===ub.id;});uh+="<div class=\"row-item\"><div><div style=\"font-weight:600;font-size:13px\">"+ub.name+"</div><div style=\"font-size:11px;color:var(--txm)\">"+fmtD(ub.dueDate)+"</div></div><div style=\"display:flex;gap:7px;align-items:center\">"+(isn?bdg("⚠ Soon","var(--orange)"):"")+"<span style=\"font-weight:700;font-size:13px;color:var(--red)\">"+fmt(ub.amount)+"</span></div></div>";});}
-  $("upcoming-list").innerHTML=uh;
-  var ch="";Object.entries(s.catTotals).sort(function(a,b){return b[1]-a[1];}).forEach(function(e){ch+=mbar(e[0],e[1],s.totalBills||1,CCOL[e[0]]||"#888");});
-  $("cat-bars").innerHTML=ch||"<p style=\"color:var(--txm);font-size:13px\">No bills yet.</p>";
-  $("income-bars").innerHTML=mbar("Income",s.totalIncome,Math.max(s.totalIncome,s.totalBills)||1,"var(--green)")+mbar("Bills",s.totalBills,Math.max(s.totalIncome,s.totalBills)||1,"var(--red)")+mbar("Allocated",s.allocated,s.totalIncome||1,"var(--acc)");
-  var net=s.totalIncome-s.totalBills;$("net-value").textContent=fmt(net);$("net-value").style.color=net>=0?"var(--green)":"var(--red)";
-  var al="";if(!s.up7.length&&s.unalloc<=0&&s.totalBills<=s.totalIncome)al="<p style=\"font-size:13px;color:var(--green)\">✓ No urgent alerts.</p>";
-  s.up7.forEach(function(b){al+="<div style=\"display:flex;gap:8px;padding:8px 10px;margin-bottom:7px;background:rgba(196,142,94,.15);border-radius:7px;border-left:3px solid var(--orange)\"><span>⚠</span><div><div style=\"font-weight:600;font-size:13px\">"+b.name+" due "+fmtD(b.dueDate)+"</div><div style=\"font-size:11px;color:var(--txm)\">"+fmt(b.amount)+"</div></div></div>";});
-  if(s.unalloc>0)al+="<div style=\"display:flex;gap:8px;padding:8px 10px;margin-bottom:7px;background:rgba(106,196,122,.15);border-radius:7px;border-left:3px solid var(--green)\"><span>💡</span><div><div style=\"font-weight:600;font-size:13px\">"+fmt(s.unalloc)+" unallocated</div><div style=\"font-size:11px;color:var(--txm)\">Go to Allocate tab</div></div></div>";
-  if(s.totalBills>s.totalIncome)al+="<div style=\"display:flex;gap:8px;padding:8px 10px;background:rgba(196,107,122,.15);border-radius:7px;border-left:3px solid var(--red)\"><span>🚨</span><div><div style=\"font-weight:600;font-size:13px\">Shortfall: "+fmt(s.totalBills-s.totalIncome)+"</div><div style=\"font-size:11px;color:var(--txm)\">Bills exceed income</div></div></div>";
-  $("alerts-list").innerHTML=al;
-}
-
-function renderIncome(){
-  function ml(list){if(!list.length)return "<p style=\"color:var(--txm);font-size:13px;margin-bottom:8px\">None yet.</p>";var h="";list.forEach(function(i){h+="<div class=\"item-card "+(i.received?"":"upcoming-inc")+"\"><div class=\"row-l\"><div class=\"row-icon\" style=\"background:"+(i.received?"rgba(106,196,122,.18)":"rgba(79,134,198,.18)")+"\">"+(i.received?"💵":"📅")+"</div><div><div style=\"font-weight:700;font-size:14px\">"+i.name+"</div><div style=\"font-size:11px;color:var(--txm)\">"+(FREQ[i.frequency]||i.frequency)+" · "+fmtD(i.nextDate)+"</div></div></div><div class=\"row-r\"><span style=\"font-weight:700;font-size:15px;color:"+(i.received?"var(--green)":"var(--acc)")+"\">"+fmt(i.amount)+"</span>"+(i.received?"<button class=\"btn btn-ghost btn-sm\" onclick=\"togRec('"+i.id+"')\">Mark Upcoming</button>":"<button class=\"btn btn-green btn-sm\" onclick=\"togRec('"+i.id+"')\">✓ Received</button>")+"<button class=\"btn btn-ghost btn-sm\" onclick=\"openIncModal('"+i.id+"')\">Edit</button><button class=\"btn btn-danger btn-sm\" onclick=\"delInc('"+i.id+"')\">Remove</button></div></div>";});return h;}
-  $("income-received").innerHTML=ml(S.incomes.filter(function(i){return i.received;}));
-  $("income-upcoming").innerHTML=ml(S.incomes.filter(function(i){return !i.received;}));
-}
-
-function renderBills(){
-  var s=stats();var html="";
-  getAllCategories().forEach(function(cat){var cb=S.bills.filter(function(b){return b.category===cat;});if(!cb.length)return;var col=CCOL[cat]||"#888";var ct=cb.reduce(function(a,b){return a+b.amount;},0);html+="<div style=\"margin-bottom:20px\"><div style=\"display:flex;align-items:center;gap:8px;margin-bottom:8px\"><div style=\"width:9px;height:9px;border-radius:50%;background:"+col+"\"></div><div class=\"sec-title\" style=\"margin-bottom:0\">"+cat+"</div><span style=\"font-size:12px;color:var(--txm);margin-left:auto\">"+fmt(ct)+"</span></div>";cb.forEach(function(b){var ov=!b.paid&&b.dueDate<TD;var sn=!b.paid&&s.up7.some(function(x){return x.id===b.id;});html+="<div class=\"item-card "+(b.paid?"paid-card":"")+" "+(ov?"overdue":sn?"soon":"")+"\"><div class=\"row-l\"><input type=\"checkbox\" "+(b.paid?"checked":"")+" onchange=\"togPaid('"+b.id+"')\" style=\"width:16px;height:16px;cursor:pointer;accent-color:var(--acc)\"><div><div style=\"font-weight:700;font-size:14px;text-decoration:"+(b.paid?"line-through":"none")+"\">"+b.name+"</div><div style=\"font-size:11px;color:var(--txm)\">Due "+fmtD(b.dueDate)+" · "+(FREQ[b.frequency]||b.frequency)+(ov?" <span style=\"color:var(--red);font-weight:700\">· OVERDUE</span>":sn?" <span style=\"color:var(--orange);font-weight:700\">· Soon</span>":"")+"</div></div></div><div class=\"row-r\"><span style=\"font-weight:700;font-size:14px;color:"+(b.paid?"var(--txm)":"var(--red)")+"\">"+fmt(b.amount)+"</span>"+(b.paid?bdg("Paid","var(--green)"):"")+"<button class=\"btn btn-ghost btn-sm\" onclick=\"openBillModal('"+b.id+"')\">Edit</button><button class=\"btn btn-danger btn-sm\" onclick=\"delBill('"+b.id+"')\">Remove</button></div></div>";});html+="</div>";});
-  $("bills-list").innerHTML=html||"<p style=\"color:var(--txm);font-size:13px\">No bills yet.</p>";
-}
-
-function renderAllocate(){
-  var s=stats();var ib="";
-  S.incomes.forEach(function(i){var used=s.incUsed[i.id]||0;var left=getIncomeRemaining(i.id,s);var pct=i.amount>0?Math.round((used/i.amount)*100):0;ib+="<div class=\"card\" style=\"padding:8px 12px;min-width:130px\"><div style=\"font-size:11px;color:var(--txm);font-weight:700\">"+i.name+"</div><div style=\"font-weight:700;font-size:14px;color:var(--acc);margin-top:2px\">"+fmt(left)+" left</div><div style=\"background:var(--bord);border-radius:3px;height:4px;margin-top:5px\"><div style=\"background:"+(pct>90?"var(--red)":"var(--acc)")+";width:"+Math.min(100,pct)+"%;height:100%;border-radius:3px\"></div></div><div style=\"font-size:10px;color:var(--txm);margin-top:2px\">"+pct+"% allocated</div></div>";});
-  $("alloc-income-bars").innerHTML=ib;
-  var iSel=$("alloc-income-sel"),bSel=$("alloc-bill-sel"),iv=iSel.value,bv=bSel.value;
-  var availableIncomes=S.incomes.filter(function(i){return getIncomeRemaining(i.id,s)>0;});
-  var availableBills=S.bills.filter(function(b){return getBillRemaining(b.id,s)>0;});
-  iSel.innerHTML="<option value=\"\">Select income…</option>"+availableIncomes.map(function(i){return "<option value=\""+i.id+"\""+(iv===i.id?" selected":"")+">"+i.name+" ("+fmt(getIncomeRemaining(i.id,s))+" left)</option>";}).join("");
-  bSel.innerHTML="<option value=\"\">Select bill…</option>"+availableBills.map(function(b){return "<option value=\""+b.id+"\""+(bv===b.id?" selected":"")+">"+b.name+" ("+fmt(getBillRemaining(b.id,s))+" left)</option>";}).join("");
-  if(iv && !availableIncomes.some(function(i){return i.id===iv;})) iSel.value="";
-  if(bv && !availableBills.some(function(b){return b.id===bv;})) bSel.value="";
-  var ah="";if(!S.allocations.length){ah="<p style=\"color:var(--txm);font-size:13px;text-align:center;padding:20px\">No allocations yet.</p>";}else{S.allocations.forEach(function(a){var ai=S.incomes.find(function(x){return x.id===a.incomeId;});var ab=S.bills.find(function(x){return x.id===a.billId;});if(!ai||!ab)return;ah+="<div class=\"alloc-row\"><span style=\"font-size:13px\"><span style=\"font-weight:700;color:var(--acc)\">"+ai.name+"</span><span style=\"color:var(--txm);margin:0 7px\">→</span><span style=\"font-weight:700\">"+ab.name+"</span></span><div style=\"display:flex;align-items:center;gap:10px\"><span style=\"font-weight:700\">"+fmt(a.amount)+"</span><button class=\"rm-btn\" onclick=\"delAlloc('"+a.id+"')\">×</button></div></div>";});}
-  $("alloc-list").innerHTML=ah;
-}
-
-function renderTimeline(){
-  var s=stats();var evs=[];
-  S.incomes.forEach(function(i){evs.push({date:i.nextDate,type:"income",label:i.name,amount:i.amount,received:i.received});});
-  S.bills.forEach(function(b){evs.push({date:b.dueDate,type:"bill",label:b.name,amount:-b.amount,paid:b.paid,category:b.category});});
-  evs.sort(function(a,b){return a.date.localeCompare(b.date);});
-  var bal=0,html="<div class=\"t-line\"></div>";
-  evs.forEach(function(ev){bal+=ev.amount;var past=ev.date<TD,isT=ev.date===TD,short=bal<0,dc=ev.type==="income"?"var(--green)":(ev.paid?"var(--txm)":"var(--red)");html+="<div class=\"t-item\"><div class=\"t-dot\" style=\"background:"+dc+";opacity:"+(past?.5:1)+"\"></div><div class=\"t-card "+(isT?"today":"")+" "+(past?"past":"")+"\"><div class=\"t-row\"><div><div style=\"font-weight:700;font-size:13px\">"+ev.label+"</div><div style=\"font-size:11px;color:var(--txm);margin-top:2px\">"+fmtD(ev.date)+" "+(isT?bdg("Today","var(--acc)"):"")+" "+(ev.type==="income"&&!ev.received?bdg("Projected","var(--orange)"):"")+" "+(ev.type==="bill"&&ev.paid?bdg("Paid","var(--green)"):"")+" "+(ev.type==="bill"&&!ev.paid&&ev.category?bdg(ev.category,CCOL[ev.category]||"#888"):"")+"</div></div><div style=\"text-align:right;flex-shrink:0\"><div style=\"font-weight:700;font-size:14px;color:"+(ev.type==="income"?"var(--green)":"var(--red)")+"\">"+(ev.type==="income"?"+":"-")+fmt(Math.abs(ev.amount))+"</div><div style=\"font-size:11px;color:"+(short?"var(--red)":"var(--txm)")+";font-weight:"+(short?700:400)+"\">bal: "+fmt(bal)+"</div></div></div></div></div>";});
-  $("timeline-list").innerHTML=html;
-  var net=s.totalIncome-s.totalBills;
-  $("timeline-summary").innerHTML="<div style=\"display:flex;justify-content:space-between;margin-bottom:4px\"><span style=\"font-size:13px;color:var(--txm)\">Incoming</span><span style=\"font-weight:700;font-size:14px;color:var(--green)\">"+fmt(s.totalIncome)+"</span></div><div style=\"display:flex;justify-content:space-between;margin-bottom:4px\"><span style=\"font-size:13px;color:var(--txm)\">Outgoing</span><span style=\"font-weight:700;font-size:14px;color:var(--red)\">"+fmt(s.totalBills)+"</span></div><div style=\"display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--bord)\"><span style=\"font-size:13px;color:var(--txm)\">Net</span><span style=\"font-weight:700;font-size:14px;color:"+(net>=0?"var(--green)":"var(--red)")+"\">"+fmt(net)+"</span></div>";
-  renderSyncInfo();
-}
-
-function renderSyncInfo(){$("sync-info").innerHTML="<div>Source of truth: Google Sheets</div>" + "<div>Webhook: Apps Script /exec</div>" + "<div>Sheet: "+(S.sheetName||"BudgetTool")+"</div>" + (S.lastSyncedCell?"<div style=\"margin-top:4px;color:var(--green)\">Sheet B1:<br>"+S.lastSyncedCell+"</div>":"<div>Sheet B1 not available yet</div>") + (S.lastSynced?"<div style=\"margin-top:4px;color:var(--green)\">Last app sync:<br>"+new Date(S.lastSynced).toLocaleString()+"</div>":"<div>Not yet synced</div>");}
-
-function render(){
-  if(currentTab==="dashboard")renderDashboard();
-  else if(currentTab==="income")renderIncome();
-  else if(currentTab==="bills")renderBills();
-  else if(currentTab==="allocate")renderAllocate();
-  else if(currentTab==="timeline")renderTimeline();
-}
-
-var modalCb=null;
-function openModal(t,h,cb){
-  $("modal-title").textContent=t;
-  $("modal-body").innerHTML=h;
-  $("modal-overlay").classList.add("open");
-  modalCb=cb;
-  var catSel=$("fc"),newCatWrap=$("new-cat-wrap"),newCatInput=$("new-cat-input");
-  if(catSel&&newCatWrap){
-    var syncNewCategoryUI=function(){
-      var show=catSel.value==="__new__";
-      newCatWrap.style.display=show?"flex":"none";
-      if(show&&newCatInput)setTimeout(function(){newCatInput.focus();},0);
-      if(!show&&newCatInput)newCatInput.value="";
-    };
-    catSel.addEventListener("change",syncNewCategoryUI);
-    syncNewCategoryUI();
-  }
-  var sb=$("modal-body").querySelector("[data-save]");
-  if(sb)sb.addEventListener("click",function(){if(modalCb&&modalCb())closeModal();});
-}
-function closeModal(){$("modal-overlay").classList.remove("open");$("modal-body").innerHTML="";modalCb=null;}
-
-var iF=function(i){return "<div class=\"form-col\"><div class=\"field\"><label>Source Name</label><input class=\"inp\" id=\"fn\" value=\""+(i.name||"")+"\" placeholder=\"e.g. Primary Job\"></div><div class=\"field\"><label>Amount ($)</label><input class=\"inp\" id=\"fa\" type=\"number\" value=\""+(i.amount||"")+"\"></div><div class=\"field\"><label>Frequency</label><select class=\"inp\" id=\"ff\"><option value=\"weekly\" "+(i.frequency==="weekly"?"selected":"")+">Weekly</option><option value=\"biweekly\" "+(!i.frequency||i.frequency==="biweekly"?"selected":"")+">Bi-weekly</option><option value=\"monthly\" "+(i.frequency==="monthly"?"selected":"")+">Monthly</option><option value=\"once\" "+(i.frequency==="once"?"selected":"")+">One-time</option></select></div><div class=\"field\"><label>Next / Expected Pay Date</label><input class=\"inp\" id=\"fd\" type=\"date\" value=\""+(i.nextDate||TD)+"\"></div><label class=\"cb-row\"><input type=\"checkbox\" id=\"fr\" "+(i.received?"checked":"")+"> Already received</label><div class=\"form-actions\"><button class=\"btn btn-primary\" data-save>Save</button><button class=\"btn btn-ghost\" onclick=\"closeModal()\">Cancel</button></div></div>";};
-var bF=function(b){var selected=b.category||"Housing";var co="";getAllCategories().forEach(function(c){co+="<option value=\""+c+"\" "+(selected===c?"selected":"")+">"+c+"</option>";});co+="<option value=\"__new__\">+ Add new category…</option>";return "<div class=\"form-col\"><div class=\"field\"><label>Bill Name</label><input class=\"inp\" id=\"fn\" value=\""+(b.name||"")+"\" placeholder=\"e.g. Rent\"></div><div class=\"field\"><label>Amount ($)</label><input class=\"inp\" id=\"fa\" type=\"number\" value=\""+(b.amount||"")+"\"></div><div class=\"field\"><label>Due Date</label><input class=\"inp\" id=\"fd\" type=\"date\" value=\""+(b.dueDate||TD)+"\"></div><div class=\"field\"><label>Category</label><select class=\"inp\" id=\"fc\">"+co+"</select></div><div class=\"field\" id=\"new-cat-wrap\" style=\"display:none\"><label>New Category</label><input class=\"inp\" id=\"new-cat-input\" placeholder=\"Enter category name\"></div><div class=\"field\"><label>Recurrence</label><select class=\"inp\" id=\"ff\"><option value=\"once\" "+(!b.frequency||b.frequency==="once"?"selected":"")+">One-time</option><option value=\"weekly\" "+(b.frequency==="weekly"?"selected":"")+">Weekly</option><option value=\"monthly\" "+(b.frequency==="monthly"?"selected":"")+">Monthly</option></select></div><label class=\"cb-row\"><input type=\"checkbox\" id=\"fp\" "+(b.paid?"checked":"")+"> Already paid</label><div class=\"form-actions\"><button class=\"btn btn-primary\" data-save>Save</button><button class=\"btn btn-ghost\" onclick=\"closeModal()\">Cancel</button></div></div>";};
-
-window.openIncModal=function(id){var i=id?S.incomes.find(function(x){return x.id===id;}):{};openModal(id?"Edit Income":"Add Income Source",iF(i||{}),function(){var n=$("fn").value.trim(),a=parseFloat($("fa").value);if(!n||!a)return false;mutate(function(s){var o={id:id||uid(),name:n,amount:a,frequency:$("ff").value,nextDate:$("fd").value,received:$("fr").checked};if(id){for(var i=0;i<s.incomes.length;i++)if(s.incomes[i].id===id){s.incomes[i]=o;break;}}else s.incomes.push(o);});return true;});};
-window.openBillModal=function(id){var b=id?S.bills.find(function(x){return x.id===id;}):{};openModal(id?"Edit Bill":"Add Bill",bF(b||{}),function(){var n=$("fn").value.trim(),a=parseFloat($("fa").value);if(!n||!a)return false;var selectedCategory=$("fc").value;if(selectedCategory==="__new__"){var newCategory=addCustomCategory($("new-cat-input") ? $("new-cat-input").value : "");if(!newCategory)return false;selectedCategory=newCategory;}mutate(function(s){if(!Array.isArray(s.customCategories))s.customCategories=[];if(s.customCategories.indexOf(selectedCategory)===-1&&CATS.indexOf(selectedCategory)===-1){s.customCategories.push(selectedCategory);}var o={id:id||uid(),name:n,amount:a,dueDate:$("fd").value,category:selectedCategory,frequency:$("ff").value,paid:$("fp").checked};if(id){for(var i=0;i<s.bills.length;i++)if(s.bills[i].id===id){s.bills[i]=o;break;}}else s.bills.push(o);});return true;});};
-window.togRec=function(id){mutate(function(s){var i=s.incomes.find(function(x){return x.id===id;});if(i)i.received=!i.received;});};
-window.togPaid=function(id){mutate(function(s){var b=s.bills.find(function(x){return x.id===id;});if(b)b.paid=!b.paid;});};
-window.delInc=function(id){if(!confirm("Remove this income source?"))return;mutate(function(s){s.incomes=s.incomes.filter(function(i){return i.id!==id;});s.allocations=s.allocations.filter(function(a){return a.incomeId!==id;});});};
-window.delBill=function(id){if(!confirm("Remove this bill?"))return;mutate(function(s){s.bills=s.bills.filter(function(b){return b.id!==id;});s.allocations=s.allocations.filter(function(a){return a.billId!==id;});});};
-window.delAlloc=function(id){mutate(function(s){s.allocations=s.allocations.filter(function(a){return a.id!==id;});});};
-window.closeModal=closeModal;
-
-document.querySelectorAll(".tab-btn").forEach(function(b){b.addEventListener("click",function(){switchTab(b.dataset.tab);});});
-var mobileSel=$("mobile-tab-select"); if(mobileSel){mobileSel.addEventListener("change",function(){switchTab(this.value);});}
-$("theme-btn").addEventListener("click",function(){darkMode=!darkMode;applyTheme();});
-$("add-income-btn").addEventListener("click",function(){openIncModal(null);});
-$("add-bill-btn").addEventListener("click",function(){openBillModal(null);});
-$("export-btn").addEventListener("click",function(){var bl=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),url=URL.createObjectURL(bl),a=document.createElement("a");a.href=url;a.download="budget.json";a.click();});
-$("sync-now-btn").addEventListener("click",function(){pushSheets(null);});
-$("modal-overlay").addEventListener("click",function(e){if(e.target===$("modal-overlay"))closeModal();});
-$("modal-close").addEventListener("click",closeModal);
-$("alloc-add-btn").addEventListener("click",function(){
-  var incId=$("alloc-income-sel").value,billId=$("alloc-bill-sel").value;if(!incId||!billId)return;
-  var s=stats();
-  var incomeRemaining=getIncomeRemaining(incId,s);
-  var billRemaining=getBillRemaining(billId,s);
-  var maxAlloc=Math.min(incomeRemaining,billRemaining);
-  var requested=parseFloat($("alloc-amount").value);
-  var amt=$("alloc-amount").value?Math.min(requested,maxAlloc):maxAlloc;
-  if(!isFinite(amt)||amt<=0)return;$("alloc-amount").value="";
-  mutate(function(s){s.allocations.push({id:uid(),incomeId:incId,billId:billId,amount:amt});});
-});
-
-// ── Boot: load from Google Sheets first ──
-(function boot(){
-  applyTheme();
-  setSyncUI("loading");
-  $("load-msg").textContent="Loading your budget from Google Sheets…";
-
-  loadFromSheets().then(function(){
-    $("loading-screen").classList.add("hidden");
-    $("app").style.display="block";
-    setSyncUI("idle");
-    render();
-  }).catch(function(err){
-    console.error("Initial load failed:", err);
-    S = normalizeState({incomes:[],bills:[],allocations:[],lastSynced:null,sheetName:"BudgetTool",lastSyncedCell:null});
-    $("loading-screen").classList.add("hidden");
-    $("app").style.display="block";
-    setSyncUI("error");
-    render();
-    alert("Could not load from Google Sheets. Check your Apps Script deployment URL and permissions.");
+function renderQ(){
+  const q=Q[curQ];
+  document.getElementById('qc').textContent=curQ+1;
+  document.getElementById('ac').textContent=ans.filter(a=>a!==null).length;
+  document.getElementById('prog').style.width=((curQ+1)/65*100)+'%';
+  document.getElementById('dtag').textContent='Domain '+q.d+' · '+DNAMES[q.d];
+  document.getElementById('dtag').style.color=DCOL[q.d];
+  document.getElementById('qmeta').textContent='Question '+(curQ+1)+' of 65'+(flags.has(curQ)?' · ⚑ Flagged':'');
+  document.getElementById('qtext').textContent=q.t;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    const isSelected=ans[curQ]===i;
+    const reveal=done||mode==='review';
+    if(reveal){d.className='opt locked'+(i===q.a?' correct':isSelected&&i!==q.a?' wrong':'');}
+    else d.className='opt'+(isSelected?' sel':'');
+    d.innerHTML='<span class="opt-key">'+ks[i]+'</span><span class="opt-txt">'+o+'</span>';
+    if(!done&&mode!=='review')d.onclick=()=>pick(i);
+    oc.appendChild(d);
   });
-})();
+  const eb=document.getElementById('expbox');
+  if(done||mode==='review'){eb.innerHTML='<b>Explanation:</b> '+q.e;eb.className='exp-box show';}
+  else eb.className='exp-box';
+  document.getElementById('pbtn').disabled=curQ===0;
+  document.getElementById('fbtn').textContent=flags.has(curQ)?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('nbtn').textContent=curQ===64?'Finish →':'Next →';
+  buildGrid('qgrid');
+}
+
+function pick(i){
+  if(done)return;
+  ans[curQ]=i;renderQ();
+  if(mode==='review'){const eb=document.getElementById('expbox');eb.innerHTML='<b>Explanation:</b> '+Q[curQ].e;eb.className='exp-box show';}
+}
+
+function go(d){
+  if(curQ+d>=0&&curQ+d<65){curQ+=d;renderQ();}
+  else if(d>0&&curQ===64)doSubmit();
+}
+
+function toggleFlag(){flags.has(curQ)?flags.delete(curQ):flags.add(curQ);renderQ();}
+
+function calcScore(){return Math.round(100+(ans.filter((a,i)=>a===Q[i].a).length/65)*900);}
+
+function doSubmit(){
+  clearInterval(ti);done=true;
+  const sc=calcScore(),cor=ans.filter((a,i)=>a===Q[i].a).length,pass=sc>=720;
+  document.getElementById('snum').textContent=sc;
+  document.getElementById('snum').className='score-num '+(pass?'pass':'fail');
+  document.getElementById('sring').className='score-ring '+(pass?'pass':'fail');
+  document.getElementById('verd').textContent=pass?'PASS ✓':'Not Passing Yet';
+  document.getElementById('verd').className='verdict '+(pass?'pass':'fail');
+  document.getElementById('rsub').textContent=cor+' / 65 correct · '+Math.round(cor/65*100)+'% · Threshold: 720';
+  const drg=document.getElementById('drg');drg.innerHTML='';
+  [1,2,3,4].forEach(d=>{
+    const qs=Q.map((q,i)=>({q,i})).filter(({q})=>q.d===d);
+    const dc=qs.filter(({i})=>ans[i]===Q[i].a).length;
+    const pct=Math.round(dc/qs.length*100);
+    const col=pct>=72?'#3fcf8e':pct>=50?'#f0c040':'#f25c54';
+    const div=document.createElement('div');div.className='dr';
+    div.innerHTML='<div class="dr-top"><span class="dr-name">D'+d+': '+DNAMES[d]+'</span><span class="dr-pct" style="color:'+col+'">'+dc+'/'+qs.length+' ('+pct+'%)</span></div><div class="dr-track"><div class="dr-fill" style="width:'+pct+'%;background:'+col+'"></div></div>';
+    drg.appendChild(div);
+  });
+  showS('s-results');
+}
+
+function goReview(){
+  rvQ=0;
+  document.getElementById('rvscr').textContent=ans.filter((a,i)=>a===Q[i].a).length+'/65 correct';
+  buildGrid('rvgrid');renderRev();showS('s-review');
+}
+
+function renderRev(){
+  const q=Q[rvQ];
+  document.getElementById('rvc').textContent=rvQ+1;
+  document.getElementById('rvdtag').textContent='Domain '+q.d+' · '+DNAMES[q.d];
+  document.getElementById('rvdtag').style.color=DCOL[q.d];
+  const st=ans[rvQ]===q.a?'✓ Correct':ans[rvQ]!==null?'✗ Incorrect':'— Skipped';
+  const sc=ans[rvQ]===q.a?'#3fcf8e':ans[rvQ]!==null?'#f25c54':'#7a8394';
+  document.getElementById('rvmeta').innerHTML='Question '+(rvQ+1)+' — <span style="color:'+sc+';font-weight:600">'+st+'</span>';
+  document.getElementById('rvtext').textContent=q.t;
+  const oc=document.getElementById('rvopts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt locked'+(i===q.a?' correct':ans[rvQ]===i?' wrong':'');
+    d.innerHTML='<span class="opt-key">'+ks[i]+'</span><span class="opt-txt">'+o+'</span>';
+    oc.appendChild(d);
+  });
+  document.getElementById('rvexp').innerHTML='<b>Explanation:</b> '+q.e;
+  document.getElementById('rvpbtn').disabled=rvQ===0;
+  document.getElementById('rvnbtn').textContent=rvQ===64?'Done →':'Next →';
+  buildGrid('rvgrid');
+}
+
+function rvGo(d){
+  if(rvQ+d>=0&&rvQ+d<65){rvQ+=d;renderRev();}
+  else if(d>0)showS('s-results');
+}
+
+function resetExam(){showS('s-start');}
 </script>
 </body>
 </html>
