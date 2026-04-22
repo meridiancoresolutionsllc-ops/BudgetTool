@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEA-C01 · Domain 4 Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f12;--surf:#13161b;--surf2:#1a1e25;--surf3:#21262f;
+  --bdr:#2a2f3a;--bdr2:#343b48;--text:#e8eaf0;--muted:#7a8394;
+  --accent:#c084f0;--accent2:#9a50d0;--green:#3fcf8e;--red:#f25c54;--blue:#5b9cf6;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+#app{max-width:840px;margin:0 auto;padding:24px 16px 60px}
+.screen{display:none}.screen.active{display:block;animation:fu .25s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:16px}
+.timer{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);letter-spacing:2px}
+.timer.warn{color:#ef9f27}.timer.danger{color:var(--red);animation:bl 1s step-end infinite}
+@keyframes bl{50%{opacity:.4}}
+.topbar-info{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+.prog-track{height:3px;background:var(--bdr);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .35s}
+
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(32px,1fr));gap:4px;margin-bottom:16px}
+.qdot{font-family:var(--mono);font-size:10px;font-weight:600;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);transition:all .12s}
+.qdot:hover{border-color:var(--bdr2);color:var(--text)}
+.qdot.done{background:#1f2410;border-color:#c084f055;color:var(--accent)}
+.qdot.cur{border:1.5px solid var(--accent);color:var(--accent);background:var(--surf2)}
+.qdot.flagged{border-color:#ef9f27;color:#ef9f27}
+.qdot.r-right{background:#1a2e22;border-color:var(--green);color:var(--green)}
+.qdot.r-wrong{background:#2a1818;border-color:var(--red);color:var(--red)}
+.qdot.r-skip{background:var(--surf);border-color:var(--bdr);color:var(--muted)}
+
+.qcard{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
+.dtag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:#140c20;border:1px solid #2a1840;border-radius:4px;padding:3px 10px;margin-bottom:12px}
+.qmeta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
+.qtext{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border:1px solid var(--bdr);border-radius:7px;cursor:pointer;background:var(--surf2);transition:all .12s}
+.opt:hover:not(.locked){border-color:var(--bdr2);background:var(--surf3)}
+.opt.sel{border-color:var(--accent);background:#140c20}
+.opt.correct{border-color:var(--green);background:#122018}
+.opt.wrong{border-color:var(--red);background:#200e0e}
+.opt.locked{cursor:default}
+.ok{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:16px;padding-top:1px}
+.opt.sel .ok{color:var(--accent)}.opt.correct .ok{color:var(--green)}.opt.wrong .ok{color:var(--red)}
+.ot{font-size:14px;color:var(--text);line-height:1.5}
+
+.exp{display:none;padding:13px 15px;border-radius:7px;background:var(--surf2);border-left:3px solid var(--blue);font-size:13px;line-height:1.7;color:#9eb3cc;margin-bottom:14px}
+.exp.show{display:block;animation:fu .2s ease}
+.exp b{color:var(--blue)}
+
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.5px;padding:9px 18px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--muted);cursor:pointer;transition:all .12s;text-transform:uppercase}
+.btn:hover{border-color:var(--text);color:var(--text)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-ac{border-color:var(--accent);color:var(--accent);background:#140c20}
+.btn-ac:hover{background:#2a1840}
+.btn-dn{border-color:#5a2020;color:#c06060}
+.btn-dn:hover{border-color:var(--red);color:var(--red);background:#1a0808}
+.btn-gn{border-color:var(--green);color:var(--green);background:#0e1e16}
+.btn-gn:hover{background:#162a1e}
+
+.hero{text-align:center;padding:36px 0 28px}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.htitle{font-size:32px;font-weight:300;color:var(--text);margin-bottom:4px;letter-spacing:-1px}
+.htitle span{font-weight:600;color:var(--accent)}
+.hsub{font-size:13px;color:var(--muted);margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:400px;margin:0 auto 24px}
+.stat{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center}
+.sv{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
+.sl{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.modes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.mbtn{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;border-radius:7px;border:1px solid var(--bdr2);background:var(--surf);color:var(--muted);cursor:pointer;transition:all .18s}
+.mbtn:hover{border-color:var(--text);color:var(--text)}
+.mbtn.on{border-color:var(--accent);color:var(--accent);background:#140c20}
+
+.rtop{text-align:center;padding:28px 0 20px}
+.sring{width:120px;height:120px;border-radius:50%;margin:0 auto 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.sring::before{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--bdr)}
+.sring.pass::after,.sring.fail::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid transparent}
+.sring.pass::after{border-color:var(--green)}.sring.fail::after{border-color:var(--red)}
+.snum{font-family:var(--mono);font-size:38px;font-weight:600}
+.snum.pass{color:var(--green)}.snum.fail{color:var(--red)}
+.slbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
+.verd{font-size:20px;font-weight:600;margin-bottom:5px}
+.verd.pass{color:var(--green)}.verd.fail{color:var(--red)}
+.rsub{font-size:12px;color:var(--muted);margin-bottom:22px;font-family:var(--mono)}
+.rbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+.rvhdr{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:14px}
+.rvmeta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="s-start" class="screen active">
+  <div class="hero">
+    <div class="kicker">DEA-C01 Domain Focus Exam</div>
+    <h1 class="htitle">Domain 4: <span>Data Security & Governance</span></h1>
+    <p class="hsub">IAM, KMS, Lake Formation, VPC, encryption, Macie, CloudTrail, compliance</p>
+    <div class="stats">
+      <div class="stat"><div class="sv">30</div><div class="sl">Questions</div></div>
+      <div class="stat"><div class="sv">18%</div><div class="sl">Exam weight</div></div>
+      <div class="stat"><div class="sv">720</div><div class="sl">Pass score</div></div>
+    </div>
+    <div class="modes">
+      <button class="mbtn on" id="m-timed" onclick="setMode('timed')">⏱ Timed</button>
+      <button class="mbtn" id="m-practice" onclick="setMode('practice')">◎ Practice</button>
+      <button class="mbtn" id="m-review" onclick="setMode('review')">✦ Instant Feedback</button>
+    </div>
+    <button class="btn btn-ac" style="font-size:12px;padding:13px 36px" onclick="startExam()">Start Domain 4 Exam →</button>
+  </div>
+</div>
+
+<div id="s-exam" class="screen">
+  <div class="topbar">
+    <div class="topbar-info">Q <span id="qc">1</span>/29 &nbsp;·&nbsp; Done: <span id="ac">0</span></div>
+    <div class="timer" id="timer">1:00:00</div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:3.4%"></div></div>
+  <div id="qgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div id="dtag" class="dtag">Domain 4 · Data Security & Governance</div>
+    <div id="qmeta" class="qmeta"></div>
+    <div id="qtext" class="qtext"></div>
+    <div id="opts" class="opts"></div>
+    <div id="exp" class="exp"></div>
+    <div class="nav">
+      <button class="btn" id="pbtn" onclick="go(-1)">← Prev</button>
+      <button class="btn" id="fbtn" onclick="flagQ()">⚑ Flag</button>
+      <button class="btn btn-ac" id="nbtn" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-dn" onclick="doSubmit()">Submit Exam</button>
+  </div>
+</div>
+
+<div id="s-results" class="screen">
+  <div class="qcard">
+    <div class="rtop">
+      <div class="sring" id="sring">
+        <div class="snum" id="snum">—</div>
+        <div class="slbl">scaled</div>
+      </div>
+      <div class="verd" id="verd"></div>
+      <div class="rsub" id="rsub"></div>
+    </div>
+    <div class="rbtns">
+      <button class="btn btn-gn" onclick="goRev()">Review Answers</button>
+      <button class="btn btn-ac" onclick="reset()">Retake</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-review" class="screen">
+  <div class="rvhdr">
+    <span class="rvmeta">Review · Q <span id="rvc">1</span>/29</span>
+    <span class="rvmeta" id="rvscr"></span>
+  </div>
+  <div id="rvgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div class="dtag">Domain 4 · Data Security & Governance</div>
+    <div id="rvmeta" class="qmeta"></div>
+    <div id="rvtext" class="qtext"></div>
+    <div id="rvopts" class="opts"></div>
+    <div id="rvexp" class="exp show"></div>
+    <div class="nav">
+      <button class="btn" id="rvpb" onclick="rvGo(-1)">← Prev</button>
+      <button class="btn" onclick="showS('s-results')">Results</button>
+      <button class="btn btn-ac" id="rvnb" onclick="rvGo(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const TOTAL=30;
+const MINS=0;
+const Q=[
+  {t:"A company stores sensitive healthcare data (PHI) in S3. A compliance audit requires proof that no PHI has been accidentally stored in any non-compliant bucket across the entire AWS account. Which AWS service provides automated PHI discovery across all S3 buckets?",o:["AWS Config with S3 bucket recording", "Amazon Macie \u2014 uses ML to automatically discover and classify sensitive data (PHI, PII, credentials) in S3 and generate detailed findings", "AWS GuardDuty with S3 protection enabled", "Manual review of all S3 object contents"],a:1,e:"Amazon Macie is purpose-built for sensitive data discovery in S3. It uses ML to identify PHI, PII, financial data, and credentials across all buckets in the account. Findings include the bucket name, object key, data type found, and severity \u2014 providing the evidence needed for compliance audits."},
+  {t:"A company must rotate their AWS KMS Customer Managed Key (CMK) every 90 days to satisfy a security policy. Automatic KMS rotation only supports annual rotation. What approach achieves 90-day rotation?",o:["Enable automatic key rotation and change the rotation interval to 90 days in the KMS console", "Use the KMS RotateKeyOnDemand API to manually trigger rotation every 90 days, or create a new CMK version on a schedule", "Create a new KMS key every 90 days and re-encrypt all data", "Use AWS Secrets Manager to rotate the KMS key"],a:1,e:"KMS RotateKeyOnDemand allows immediate on-demand key rotation at any time (separate from the annual automatic schedule). Combined with an EventBridge rule triggering a Lambda every 90 days to call RotateKeyOnDemand, this achieves 90-day rotation without creating new keys or re-encrypting existing data."},
+  {t:"A data lake uses Lake Formation. Analysts must not be able to see salary data (stored in a 'salary' column) in the employees table. Non-salary columns must be fully accessible. Which Lake Formation configuration achieves this column-level restriction?",o:["Add a DENY IAM policy for the salary column on S3", "Grant SELECT on the employees table specifying only the non-salary columns \u2014 omit the salary column from the column list in the Lake Formation grant", "Create a separate S3 bucket without the salary column", "Use a Glue view that excludes the salary column"],a:1,e:"Lake Formation column-level permissions allow granting SELECT on a table while specifying an explicit list of permitted columns. Omitting the 'salary' column from the grant makes it completely invisible to that IAM principal when querying via Athena or Glue \u2014 no data masking or separate objects needed."},
+  {t:"A company's security policy requires that all data in transit between AWS services and between services and clients must use TLS 1.2 or higher. A data engineer needs to enforce this for Amazon Kinesis Data Streams. How is this enforced?",o:["Configure a security group to allow only TLS traffic", "Kinesis Data Streams always uses HTTPS/TLS for all API calls \u2014 TLS is mandatory and cannot be disabled. Enforce it on the client side by ensuring the SDK/KPL does not disable HTTPS", "Enable KMS encryption on the Kinesis stream", "Create a VPC endpoint for Kinesis"],a:1,e:"Kinesis Data Streams API calls are always over HTTPS (TLS) \u2014 AWS does not offer a plaintext HTTP endpoint for Kinesis. To enforce TLS 1.2+ on the client side, configure the AWS SDK's HTTP client settings to require TLS 1.2 minimum. The Kinesis side is already TLS-enforced by default."},
+  {t:"A company needs to ensure that all newly created S3 buckets across their AWS Organization always have server-side encryption enabled. If a bucket is created without encryption, it must be automatically remediated. Which combination achieves this policy enforcement and auto-remediation?",o:["S3 Block Public Access at the organization level", "AWS Config rule 's3-bucket-server-side-encryption-enabled' + Config Automatic Remediation using SSM Automation to enable encryption on non-compliant buckets", "SCP preventing s3:CreateBucket calls without encryption headers", "AWS Security Hub with automated response"],a:1,e:"AWS Config evaluates S3 buckets against the 's3-bucket-server-side-encryption-enabled' managed rule continuously. Config Automatic Remediation uses a pre-built SSM Automation document to enable default encryption on non-compliant buckets automatically \u2014 detection and remediation without human intervention."},
+  {t:"A data pipeline running in a private VPC subnet needs to call the AWS KMS API to decrypt data. The subnet has no internet access and no NAT Gateway. What must be created to allow the Glue job to reach KMS?",o:["An S3 Gateway Endpoint for KMS access", "A KMS Interface VPC Endpoint (AWS PrivateLink) in the subnet's VPC", "A NAT Gateway for internet access to KMS", "A VPN connection to AWS KMS"],a:1,e:"KMS does not have a Gateway Endpoint (only S3 and DynamoDB have those). To reach KMS from a private subnet without internet access, create an Interface VPC Endpoint (PrivateLink) for KMS (com.amazonaws.region.kms). This creates a private IP in the subnet with DNS resolution for the KMS endpoint."},
+  {t:"A company's IAM role used by a Glue ETL job has the policy: Effect:Allow, Action:s3:*, Resource:*. A security review flags this as overly permissive. What is the correct principle to apply and what should the policy look like?",o:["Keep s3:* but restrict to specific regions using conditions", "Apply the Principle of Least Privilege: replace s3:* with only the required actions (e.g., s3:GetObject, s3:PutObject) on specific resource ARNs (e.g., arn:aws:s3:::my-etl-bucket/*)", "Use a permission boundary instead of updating the policy", "Move to IAM Identity Center to inherit permissions"],a:1,e:"The Principle of Least Privilege requires granting only the minimum permissions needed. Replace s3:* with the specific actions the Glue job actually performs (GetObject for reading, PutObject for writing, etc.) and restrict the Resource to the specific bucket ARN and prefix. This minimizes blast radius if the role is compromised."},
+  {t:"A company uses SSE-KMS to encrypt S3 objects. The KMS key is a Customer Managed Key (CMK). A developer accidentally deletes the CMK. What is the impact and what recovery options exist?",o:["All encrypted objects are immediately inaccessible but can be recovered within 7-30 days using the KMS key deletion waiting period", "All encrypted objects are permanently and irrecoverably lost immediately", "Objects can be decrypted using the S3 default key", "The CMK can be recovered from KMS backup"],a:0,e:"KMS CMK deletion has a mandatory waiting period of 7-30 days (configurable) before permanent deletion. During this window, the deletion can be cancelled, restoring the key and re-enabling access to all encrypted objects. After the waiting period expires, the key is permanently deleted and objects are irrecoverable."},
+  {t:"A company must comply with GDPR and needs to ensure that EU customer data stored in S3 never leaves the eu-west-1 region. A rogue admin might create a cross-region replication rule. What prevents this at the organization level?",o:["S3 bucket policy denying cross-region replication", "Service Control Policy (SCP) in AWS Organizations denying s3:PutReplicationConfiguration and s3:ReplicateObject actions for all accounts in the EU OU", "IAM policy on individual admin users", "AWS Config rule detecting replication rules"],a:1,e:"SCPs in AWS Organizations are applied to all accounts in an Organizational Unit (OU) and override IAM policies \u2014 even account administrators. An SCP denying s3:PutReplicationConfiguration prevents anyone from creating cross-region replication rules on any bucket in the OU, enforcing data residency."},
+  {t:"A company uses AWS Lake Formation for a multi-tenant analytics platform. Each tenant should only be able to query their own data. The data is in a single S3 bucket and table, differentiated by a 'tenant_id' column. Which Lake Formation feature enforces tenant isolation at query time?",o:["Separate S3 prefix per tenant with IAM path conditions", "Lake Formation Row-Level Security (RLS) Data Filters \u2014 define a filter per tenant role where tenant_id = <tenant_value>; Athena automatically applies the filter at query time", "Create separate Glue tables per tenant", "VPC per tenant with private DNS"],a:1,e:"Lake Formation RLS Data Filters are assigned to IAM principals. A filter 'tenant_id = T001' assigned to Tenant T001's role means Athena automatically restricts all queries to only T001's rows \u2014 even if the analyst writes SELECT * with no WHERE clause. Other tenants' rows are never returned."},
+  {t:"A company's AWS CloudTrail is enabled with management events. A compliance officer asks why S3 GetObject calls are not visible in CloudTrail logs, even though CloudTrail is enabled. What is the explanation?",o:["CloudTrail does not support S3 API logging", "S3 GetObject is a Data Event \u2014 Data Events are disabled by default and must be explicitly enabled (they incur additional cost). Management Events only capture control-plane actions like CreateBucket, DeleteBucket", "CloudTrail logs are delayed by 24 hours for S3 events", "S3 GetObject calls appear in S3 Server Access Logs, not CloudTrail"],a:1,e:"CloudTrail separates events into Management Events (control-plane: bucket create/delete, enabled by default, low cost) and Data Events (data-plane: GetObject, PutObject, DeleteObject \u2014 disabled by default, charged per 100,000 events). Data Events must be explicitly enabled per bucket or for all S3."},
+  {t:"A Glue ETL job needs to connect to an Amazon RDS database in a private subnet. The Glue job runs in a VPC with a Glue Connection configured. The connection test fails with 'Connection timed out'. What should be checked?",o:["Increase the Glue job DPU count", "Verify that: (1) the Glue Connection's VPC/subnet matches the RDS subnet, (2) the Glue job's security group has outbound rules allowing traffic to the RDS port, (3) the RDS security group allows inbound traffic from the Glue security group", "Enable Glue Job Bookmarks for the connection", "Switch to a public RDS endpoint"],a:1,e:"A connection timeout to RDS is almost always a security group issue. Three checks: (1) Glue connection is configured with the correct VPC/subnet, (2) Glue's security group allows outbound on the RDS port (3306/5432), (3) RDS security group allows inbound from Glue's security group IP range or security group ID."},
+  {t:"A company wants to share specific tables in their data lake (managed by Lake Formation) with a partner company's AWS account. The partner should be able to query the tables using their own Athena, without having access to the underlying S3 bucket. Which Lake Formation feature enables this?",o:["S3 Cross-Account Bucket Policy granting partner account access", "Lake Formation cross-account grants \u2014 grant SELECT on specific tables to the partner account's IAM principal; the partner queries via Athena using Lake Formation permissions", "AWS Resource Access Manager (RAM) for S3 bucket sharing", "Create an IAM role in your account for the partner to assume"],a:1,e:"Lake Formation cross-account grants allow sharing specific Glue Data Catalog tables with external AWS accounts while keeping the underlying S3 bucket completely private. The partner account's Athena queries are governed by Lake Formation \u2014 they see only the granted tables and columns."},
+  {t:"A company uses S3 to store sensitive financial records. The security team requires that every S3 object read (GetObject) event be logged with the requester's identity and IP address for forensic analysis. Which configuration provides this?",o:["Enable S3 Server Access Logging", "Enable CloudTrail Data Events for S3 (ReadWriteType: ReadOnly or All) \u2014 CloudTrail captures GetObject calls with requester ARN, source IP, timestamp, and object key", "Enable Amazon Macie on the bucket", "Use VPC Flow Logs"],a:1,e:"CloudTrail Data Events for S3 capture object-level API calls including GetObject. Each log entry includes: eventTime, userIdentity (full ARN), sourceIPAddress, object key, and response code. This provides the forensic-grade audit trail the security team needs. S3 Server Access Logs also work but have less detail and are best-effort."},
+  {t:"A company is deploying a new data platform using multiple AWS accounts (dev, staging, production) managed under AWS Organizations. The security team wants to ensure that production account resources cannot be accessed by principals from dev or staging accounts, even if someone sets up an IAM role with cross-account trust. What prevents this?",o:["Enable AWS Config in all accounts", "Apply a Service Control Policy (SCP) to the production account's OU denying all API calls that include cross-account principal ARNs from dev/staging as source", "Use IAM permission boundaries in the production account", "Enable GuardDuty in all accounts"],a:1,e:"SCPs act as guardrails applied at the OU or account level. An SCP on the production account's OU can deny actions where the principal ARN matches dev or staging account patterns (using aws:PrincipalAccount condition). Even if a production IAM role trusts a dev account, the SCP prevents the dev account principal from successfully calling the action."},
+  {t:"A data engineer creates an S3 bucket and accidentally enables public read access. Amazon Macie immediately generates a 'BucketPubliclyAccessible' finding. What does this finding indicate and what is the immediate remediation?",o:["The bucket has been compromised \u2014 delete all objects immediately", "The bucket's ACL or policy grants public read access \u2014 immediately enable S3 Block Public Access on the bucket and review/remove the offending ACL or bucket policy statement", "Macie findings are informational only \u2014 no action needed", "The finding means data has already been exfiltrated"],a:1,e:"A Macie 'BucketPubliclyAccessible' finding means the bucket's access configuration allows anonymous/public reads. Immediate remediation: enable all four S3 Block Public Access settings (which override ACLs and policies), then audit and remove the specific ACL entry or policy statement that granted public access."},
+  {t:"A company must implement encryption at rest for their Kinesis Data Stream. Regulatory requirements specify that a Customer Managed Key (CMK) in AWS KMS must be used. How is this configured?",o:["Kinesis encrypts at rest by default with an AWS managed key \u2014 no configuration needed", "Enable SSE on the Kinesis Data Stream via the console or API, selecting 'AWS KMS' as the encryption type and specifying the CMK ARN", "Use client-side encryption before writing to Kinesis", "KMS encryption is only available for Kinesis Firehose, not Data Streams"],a:1,e:"Kinesis Data Streams supports server-side encryption (SSE) using KMS. In the stream settings, select 'Enable encryption' and choose 'Customer Managed CMK', then enter the CMK ARN. All records stored in the stream are encrypted using the specified CMK \u2014 satisfying the regulatory requirement."},
+  {t:"A company's data governance policy requires that all queries run against the data lake must be auditable \u2014 showing which user ran which query, against which table, and when. Which combination of services provides this query-level audit trail for Athena?",o:["Amazon CloudWatch Logs from Athena", "CloudTrail (which logs Athena StartQueryExecution API calls including the SQL query text, user identity, and timestamp) combined with S3 query result logs", "Amazon Macie scanning query results", "Athena Workgroup history only (not exportable)"],a:1,e:"CloudTrail logs every Athena API call, including StartQueryExecution. The CloudTrail event contains: userIdentity (who), eventTime (when), requestParameters.queryString (what SQL was run), and requestParameters.queryExecutionContext.database (which database). This provides the complete, immutable audit trail."},
+  {t:"A data platform team uses AWS Secrets Manager to store RDS credentials used by Lambda functions. Currently the Lambda code calls Secrets Manager on every invocation (100 invocations/second), causing high cost and latency. What is the correct optimization?",o:["Cache the secret in a DynamoDB table", "Use the AWS Secrets Manager cache client library or implement in-Lambda caching \u2014 store the secret in a Lambda execution context variable and refresh only when a rotation event is detected", "Store credentials in Lambda environment variables instead", "Increase Lambda concurrency to reduce per-invocation cost"],a:1,e:"Calling Secrets Manager on every Lambda invocation is expensive and slow. The AWS Secrets Manager caching client (available for Python, Java, Go) caches the secret in memory and only refreshes from Secrets Manager when the cached value is stale or a rotation is detected. This reduces API calls by ~99% for high-frequency functions."},
+  {t:"A company's security team requires a complete inventory of all IAM roles, their attached policies, and which services can assume each role \u2014 to detect any overly permissive trust policies (e.g., roles assumable by any AWS service). Which service performs this access analysis?",o:["AWS Config with IAM recording enabled", "AWS IAM Access Analyzer \u2014 analyzes resource policies and trust relationships to identify roles accessible from outside the account or with broad trust policies", "Amazon GuardDuty credential analysis", "AWS Security Hub findings"],a:1,e:"IAM Access Analyzer evaluates trust policies and resource-based policies to identify resources (including IAM roles) that are accessible from external principals or have overly broad trust relationships (e.g., Principal: '*' or Principal: 'Service: *'). It generates findings for each over-permissive trust policy."},
+  {t:"A company stores Parquet files in S3 encrypted with SSE-KMS using a CMK. A Glue ETL job processes these files. What IAM permissions must the Glue job's execution role have to successfully read the encrypted files?",o:["Only s3:GetObject on the bucket", "s3:GetObject on the S3 bucket AND kms:Decrypt (and kms:GenerateDataKey for writing) on the specific CMK ARN \u2014 both permissions are required", "Only kms:Decrypt on the CMK", "s3:GetObject is sufficient \u2014 KMS decryption is handled by S3 automatically"],a:1,e:"When S3 objects are encrypted with SSE-KMS, reading an object triggers a KMS Decrypt API call. The caller's IAM principal must have both: s3:GetObject on the S3 object and kms:Decrypt on the specific KMS key used to encrypt the object. Without kms:Decrypt, the read fails with an access denied error from KMS."},
+  {t:"A company uses multiple AWS services (Glue, Athena, Redshift) to process data in a Lake Formation-governed data lake. A new data engineer is granted Lake Formation permissions but their Athena queries return 'Access Denied'. CloudTrail shows the Athena calls succeed but the underlying S3 reads fail. What is the most likely cause?",o:["The engineer's IAM role lacks s3:GetObject on the S3 bucket", "The data engineer's IAM role has not been granted the Lake Formation permissions correctly \u2014 Lake Formation requires both the Lake Formation table grant AND the IAM role to have at minimum GetObject on the S3 location (or the use of Lake Formation IAM passthrough)", "The Glue Data Catalog is in a different region", "Athena workgroup permissions are missing"],a:1,e:"Lake Formation access control requires two layers: (1) Lake Formation table-level grant (for metadata access) AND (2) underlying S3 GetObject permission on the data location (for actual data reads). If the IAM role lacks s3:GetObject on the specific S3 path, Athena succeeds in planning the query but fails when reading the actual data from S3."},
+  {t:"A company builds a data platform where analysts from different departments each need customized access to different subsets of data. Rather than managing individual permissions per analyst, the security team wants tag-based access control. Which Lake Formation feature supports this?",o:["S3 object tagging with IAM conditions", "Lake Formation Tag-Based Access Control (LF-TBAC) \u2014 assign LF-tags to databases, tables, and columns; grant permissions to IAM principals based on tag key-value pairs instead of individual resource ARNs", "AWS Resource Groups for Lake Formation", "IAM attribute-based access control with S3 tags"],a:1,e:"LF-TBAC allows assigning tags (e.g., classification=sensitive, department=finance) to Glue catalog resources. Permission grants are then defined as 'role X can SELECT on tables tagged classification=public'. As new tables are added and tagged, permissions apply automatically \u2014 scalable governance without updating individual grants."},
+  {t:"A company must ensure that all API calls made by their data engineering team are logged, including the full request parameters, in an audit log that cannot be modified or deleted by anyone \u2014 including administrators. Which CloudTrail configuration achieves this?",o:["Enable CloudTrail in all regions and store logs in an S3 bucket in the same account", "Create a CloudTrail organization trail with log file integrity validation enabled, writing logs to an S3 bucket in a dedicated security account with an S3 Object Lock COMPLIANCE policy applied to the logs bucket", "Enable CloudTrail Insights in the main account", "Store CloudTrail logs in CloudWatch Logs with never-expiring retention"],a:1,e:"Three layers of protection: (1) Organization trail captures all accounts' API calls. (2) Storing logs in a separate security account prevents the data team from deleting their own audit logs. (3) S3 Object Lock in COMPLIANCE mode on the logs bucket prevents any deletion \u2014 even by the security account's root user."},
+  {t:"A company uses AWS Lake Formation. A business analyst queries an Athena table backed by Lake Formation. The analyst needs to see all columns except 'ssn' (Social Security Number). The analyst's IAM role currently has no Lake Formation permissions. What is the minimal set of Lake Formation grants needed?",o:["Grant SELECT on the table with ALL columns, then add a DENY on ssn column", "Grant the analyst's IAM role: (1) DATABASE DESCRIBE permission on the database, (2) TABLE SELECT permission on the table specifying all columns EXCEPT ssn in the column list", "Grant SELECT on the S3 bucket containing the table data", "Grant SUPER_USER permission and let the analyst manage their own access"],a:1,e:"Lake Formation grants work by explicit allowance, not denial. To grant column-subset access: (1) grant DESCRIBE on the database so the analyst can see the database, (2) grant SELECT on the table with an explicit column list that includes all columns except 'ssn'. Athena will then only return those columns."},
+  {t:"A company stores customer records in S3 encrypted with SSE-S3. A new regulation requires them to use customer-managed KMS keys (SSE-KMS) going forward AND for all existing objects. What must be done to re-encrypt existing objects?",o:["Delete and re-upload all objects with the new encryption setting", "Enable SSE-KMS as the bucket default encryption \u2014 existing objects are automatically re-encrypted", "Use S3 Batch Operations with a Copy action specifying SSE-KMS \u2014 this re-encrypts existing objects in place using the CMK", "Objects encrypted with SSE-S3 cannot be changed to SSE-KMS"],a:2,e:"Changing the bucket default encryption only applies to NEW objects. Existing objects retain their original encryption. S3 Batch Operations with the Copy object operation can re-encrypt millions of existing objects in parallel \u2014 copy each object to itself (same bucket/key) with SSE-KMS specified as the new encryption. This is the standard migration approach."},
+  {t:"A company uses Amazon GuardDuty with S3 Protection enabled. GuardDuty generates a finding: 'Exfiltration:S3/ObjectRead.Unusual' for an IAM role used by a Glue ETL job. What does this finding indicate and what should be done?",o:["GuardDuty incorrectly flags all Glue jobs \u2014 suppress this finding type", "GuardDuty's ML model detected that the Glue role accessed S3 objects in an unusual pattern (different bucket, time, or volume than baseline). Investigate by reviewing CloudTrail events for this role to determine if the access is legitimate or indicates credential compromise", "The S3 bucket has a misconfigured policy \u2014 fix the bucket policy", "The Glue job needs more DPUs \u2014 the slowness triggered the anomaly"],a:1,e:"GuardDuty 'Exfiltration:S3/ObjectRead.Unusual' uses ML to detect deviation from the role's baseline behavior (buckets, data volume, timing). It could mean legitimate pipeline changes or compromised credentials. The response is to investigate CloudTrail logs for the role, verify the Glue job's intended behavior, and check for unauthorized role usage."},
+  {t:"A company needs to implement data masking for a column containing credit card numbers in a Redshift table. Analysts should see only the last 4 digits (e.g., ****-****-****-1234). This masking should be applied dynamically based on the analyst's IAM role \u2014 not permanently stored. Which Redshift feature provides this?",o:["Create a separate masked table and grant analysts access to it", "Create a Redshift view with a CASE expression masking the column \u2014 grant analysts access to the view, not the base table", "Use Redshift Dynamic Data Masking \u2014 define a masking policy that applies REGEXP_REPLACE to the column for the analyst role", "Store masked data in a separate S3 bucket"],a:2,e:"Redshift Dynamic Data Masking (DDM) allows defining masking policies per column that are applied dynamically at query time based on the user's role. The analyst queries the base table but sees only the masked value. The actual data is never changed \u2014 masking is role-based and transparent, without views or separate tables."},
+  {t:"A company is audited for HIPAA compliance. The auditor asks for evidence that all PHI data in S3 is encrypted both at rest and in transit. How does the company demonstrate encryption in transit for S3?",o:["TLS is optional for S3 \u2014 add a bucket policy requiring it", "Enforce HTTPS-only access via an S3 bucket policy denying s3:GetObject and s3:PutObject when aws:SecureTransport is false \u2014 provide the bucket policy as evidence to the auditor", "TLS is automatically enforced by S3 \u2014 no configuration needed", "Use a WAF rule to block HTTP requests to S3"],a:1,e:"S3 supports both HTTP and HTTPS by default. To enforce HTTPS-only, add a bucket policy with: Effect: Deny, Action: s3:*, Condition: {Bool: {'aws:SecureTransport': false}}. This denies any request not using TLS. The policy document serves as auditable evidence of in-transit encryption enforcement."},
+,
+  {t:"A company uses Amazon Redshift to store financial data. Auditors require proof that no one — including DBAs — can read the contents of specific columns (e.g., ssn, account_number) when querying via the Redshift console or SQL clients. Which Redshift feature provides role-based, transparent column masking at query time?",o:["Create a Redshift view excluding the sensitive columns and revoke base table access","Enable Redshift Dynamic Data Masking (DDM) — define a masking policy for the sensitive columns applying to analyst roles, while DBAs retain full visibility","Encrypt the columns using KMS at the application layer before inserting","Use Lake Formation column-level permissions on the Redshift table"],a:1,e:"Redshift Dynamic Data Masking (DDM) applies masking functions (e.g., PARTIAL, HASH, NULL) to columns based on the querying user's role. Analysts see masked values; DBAs or privileged roles see the original data. The masking is enforced at the SQL engine level — no views or separate tables needed. This is the modern, role-based column masking solution in Redshift."}
+];
+
+let mode='timed',cur=0,ans=new Array(TOTAL).fill(null),flags=new Set(),ti=null,tLeft=TOTAL*2*60,done=false,rv=0;
+
+function setMode(m){mode=m;['timed','practice','review'].forEach(x=>document.getElementById('m-'+x).classList.toggle('on',x===m));}
+
+function showS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function startExam(){
+  ans=new Array(TOTAL).fill(null);flags=new Set();cur=0;done=false;tLeft=TOTAL*2*60;
+  buildGrid('qgrid');renderQ();showS('s-exam');
+  if(mode==='timed')startTimer();
+  else document.getElementById('timer').textContent='◎ No Limit';
+}
+
+function startTimer(){
+  clearInterval(ti);
+  ti=setInterval(()=>{
+    tLeft--;
+    const h=Math.floor(tLeft/3600),m=Math.floor((tLeft%3600)/60),s=tLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    el.className='timer'+(tLeft<180?' danger':tLeft<480?' warn':'');
+    if(tLeft<=0){clearInterval(ti);doSubmit();}
+  },1000);
+}
+
+function buildGrid(gid){
+  const g=document.getElementById(gid);g.innerHTML='';
+  const isRv=gid==='rvgrid',c=isRv?rv:cur;
+  Q.forEach((_,i)=>{
+    const d=document.createElement('div');
+    let cl='qdot';
+    if(i===c)cl+=' cur';
+    if(isRv){cl+=ans[i]===Q[i].a?' r-right':ans[i]!==null?' r-wrong':' r-skip';}
+    else{if(ans[i]!==null)cl+=' done';if(flags.has(i))cl+=' flagged';}
+    d.className=cl;d.textContent=i+1;
+    d.onclick=()=>{if(isRv){rv=i;renderRev();}else{cur=i;renderQ();}};
+    g.appendChild(d);
+  });
+}
+
+function renderQ(){
+  const q=Q[cur];
+  document.getElementById('qc').textContent=cur+1;
+  document.getElementById('ac').textContent=ans.filter(a=>a!==null).length;
+  document.getElementById('prog').style.width=((cur+1)/TOTAL*100)+'%';
+  document.getElementById('qmeta').textContent='Question '+(cur+1)+' of '+TOTAL+(flags.has(cur)?' · ⚑ Flagged':'');
+  document.getElementById('qtext').textContent=q.t;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    const sel=ans[cur]===i,rv2=done||mode==='review';
+    if(rv2)d.className='opt locked'+(i===q.a?' correct':sel&&i!==q.a?' wrong':'');
+    else d.className='opt'+(sel?' sel':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    if(!done&&mode!=='review')d.onclick=()=>pick(i);
+    oc.appendChild(d);
+  });
+  const eb=document.getElementById('exp');
+  if(done||mode==='review'){eb.innerHTML='<b>Explanation:</b> '+q.e;eb.className='exp show';}
+  else eb.className='exp';
+  document.getElementById('pbtn').disabled=cur===0;
+  document.getElementById('fbtn').textContent=flags.has(cur)?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('nbtn').textContent=cur===TOTAL-1?'Finish →':'Next →';
+  buildGrid('qgrid');
+}
+
+function pick(i){
+  if(done)return;
+  ans[cur]=i;renderQ();
+  if(mode==='review'){const eb=document.getElementById('exp');eb.innerHTML='<b>Explanation:</b> '+Q[cur].e;eb.className='exp show';}
+}
+
+function go(d){
+  if(cur+d>=0&&cur+d<TOTAL){cur+=d;renderQ();}
+  else if(d>0&&cur===TOTAL-1)doSubmit();
+}
+
+function flagQ(){flags.has(cur)?flags.delete(cur):flags.add(cur);renderQ();}
+
+function doSubmit(){
+  clearInterval(ti);done=true;
+  const cor=ans.filter((a,i)=>a===Q[i].a).length;
+  const sc=Math.round(100+(cor/TOTAL)*900);
+  const pass=sc>=720;
+  document.getElementById('snum').textContent=sc;
+  document.getElementById('snum').className='snum '+(pass?'pass':'fail');
+  document.getElementById('sring').className='sring '+(pass?'pass':'fail');
+  document.getElementById('verd').textContent=pass?'PASS ✓':'Not Passing Yet';
+  document.getElementById('verd').className='verd '+(pass?'pass':'fail');
+  document.getElementById('rsub').textContent=cor+'/'+TOTAL+' correct · '+Math.round(cor/TOTAL*100)+'% · Threshold: 720 scaled';
+  showS('s-results');
+}
+
+function goRev(){
+  rv=0;
+  document.getElementById('rvscr').textContent=ans.filter((a,i)=>a===Q[i].a).length+'/'+TOTAL+' correct';
+  buildGrid('rvgrid');renderRev();showS('s-review');
+}
+
+function renderRev(){
+  const q=Q[rv];
+  document.getElementById('rvc').textContent=rv+1;
+  const st=ans[rv]===q.a?'✓ Correct':ans[rv]!==null?'✗ Incorrect':'— Skipped';
+  const sc2=ans[rv]===q.a?'#3fcf8e':ans[rv]!==null?'#f25c54':'#7a8394';
+  document.getElementById('rvmeta').innerHTML='Question '+(rv+1)+' — <span style="color:'+sc2+';font-weight:600">'+st+'</span>';
+  document.getElementById('rvtext').textContent=q.t;
+  const oc=document.getElementById('rvopts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt locked'+(i===q.a?' correct':ans[rv]===i?' wrong':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    oc.appendChild(d);
+  });
+  document.getElementById('rvexp').innerHTML='<b>Explanation:</b> '+q.e;
+  document.getElementById('rvpb').disabled=rv===0;
+  document.getElementById('rvnb').textContent=rv===TOTAL-1?'Done →':'Next →';
+  buildGrid('rvgrid');
+}
+
+function rvGo(d){
+  if(rv+d>=0&&rv+d<TOTAL){rv+=d;renderRev();}
+  else if(d>0)showS('s-results');
+}
+
+function reset(){showS('s-start');}
+</script>
+</body>
+</html>

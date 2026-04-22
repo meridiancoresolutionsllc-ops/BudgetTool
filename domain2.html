@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEA-C01 · Domain 2 Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f12;--surf:#13161b;--surf2:#1a1e25;--surf3:#21262f;
+  --bdr:#2a2f3a;--bdr2:#343b48;--text:#e8eaf0;--muted:#7a8394;
+  --accent:#5b9cf6;--accent2:#3a7cd4;--green:#3fcf8e;--red:#f25c54;--blue:#5b9cf6;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+#app{max-width:840px;margin:0 auto;padding:24px 16px 60px}
+.screen{display:none}.screen.active{display:block;animation:fu .25s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:16px}
+.timer{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);letter-spacing:2px}
+.timer.warn{color:#ef9f27}.timer.danger{color:var(--red);animation:bl 1s step-end infinite}
+@keyframes bl{50%{opacity:.4}}
+.topbar-info{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+.prog-track{height:3px;background:var(--bdr);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .35s}
+
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(32px,1fr));gap:4px;margin-bottom:16px}
+.qdot{font-family:var(--mono);font-size:10px;font-weight:600;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);transition:all .12s}
+.qdot:hover{border-color:var(--bdr2);color:var(--text)}
+.qdot.done{background:#1f2410;border-color:#5b9cf655;color:var(--accent)}
+.qdot.cur{border:1.5px solid var(--accent);color:var(--accent);background:var(--surf2)}
+.qdot.flagged{border-color:#ef9f27;color:#ef9f27}
+.qdot.r-right{background:#1a2e22;border-color:var(--green);color:var(--green)}
+.qdot.r-wrong{background:#2a1818;border-color:var(--red);color:var(--red)}
+.qdot.r-skip{background:var(--surf);border-color:var(--bdr);color:var(--muted)}
+
+.qcard{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
+.dtag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:#0e1620;border:1px solid #1a2840;border-radius:4px;padding:3px 10px;margin-bottom:12px}
+.qmeta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
+.qtext{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border:1px solid var(--bdr);border-radius:7px;cursor:pointer;background:var(--surf2);transition:all .12s}
+.opt:hover:not(.locked){border-color:var(--bdr2);background:var(--surf3)}
+.opt.sel{border-color:var(--accent);background:#0e1620}
+.opt.correct{border-color:var(--green);background:#122018}
+.opt.wrong{border-color:var(--red);background:#200e0e}
+.opt.locked{cursor:default}
+.ok{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:16px;padding-top:1px}
+.opt.sel .ok{color:var(--accent)}.opt.correct .ok{color:var(--green)}.opt.wrong .ok{color:var(--red)}
+.ot{font-size:14px;color:var(--text);line-height:1.5}
+
+.exp{display:none;padding:13px 15px;border-radius:7px;background:var(--surf2);border-left:3px solid var(--blue);font-size:13px;line-height:1.7;color:#9eb3cc;margin-bottom:14px}
+.exp.show{display:block;animation:fu .2s ease}
+.exp b{color:var(--blue)}
+
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.5px;padding:9px 18px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--muted);cursor:pointer;transition:all .12s;text-transform:uppercase}
+.btn:hover{border-color:var(--text);color:var(--text)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-ac{border-color:var(--accent);color:var(--accent);background:#0e1620}
+.btn-ac:hover{background:#1a2840}
+.btn-dn{border-color:#5a2020;color:#c06060}
+.btn-dn:hover{border-color:var(--red);color:var(--red);background:#1a0808}
+.btn-gn{border-color:var(--green);color:var(--green);background:#0e1e16}
+.btn-gn:hover{background:#162a1e}
+
+.hero{text-align:center;padding:36px 0 28px}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.htitle{font-size:32px;font-weight:300;color:var(--text);margin-bottom:4px;letter-spacing:-1px}
+.htitle span{font-weight:600;color:var(--accent)}
+.hsub{font-size:13px;color:var(--muted);margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:400px;margin:0 auto 24px}
+.stat{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center}
+.sv{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
+.sl{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.modes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.mbtn{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;border-radius:7px;border:1px solid var(--bdr2);background:var(--surf);color:var(--muted);cursor:pointer;transition:all .18s}
+.mbtn:hover{border-color:var(--text);color:var(--text)}
+.mbtn.on{border-color:var(--accent);color:var(--accent);background:#0e1620}
+
+.rtop{text-align:center;padding:28px 0 20px}
+.sring{width:120px;height:120px;border-radius:50%;margin:0 auto 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.sring::before{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--bdr)}
+.sring.pass::after,.sring.fail::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid transparent}
+.sring.pass::after{border-color:var(--green)}.sring.fail::after{border-color:var(--red)}
+.snum{font-family:var(--mono);font-size:38px;font-weight:600}
+.snum.pass{color:var(--green)}.snum.fail{color:var(--red)}
+.slbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
+.verd{font-size:20px;font-weight:600;margin-bottom:5px}
+.verd.pass{color:var(--green)}.verd.fail{color:var(--red)}
+.rsub{font-size:12px;color:var(--muted);margin-bottom:22px;font-family:var(--mono)}
+.rbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+.rvhdr{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:14px}
+.rvmeta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="s-start" class="screen active">
+  <div class="hero">
+    <div class="kicker">DEA-C01 Domain Focus Exam</div>
+    <h1 class="htitle">Domain 2: <span>Data Store Management</span></h1>
+    <p class="hsub">S3, Redshift, DynamoDB, RDS/Aurora, ElastiCache, Lake Formation, data modeling</p>
+    <div class="stats">
+      <div class="stat"><div class="sv">30</div><div class="sl">Questions</div></div>
+      <div class="stat"><div class="sv">26%</div><div class="sl">Exam weight</div></div>
+      <div class="stat"><div class="sv">720</div><div class="sl">Pass score</div></div>
+    </div>
+    <div class="modes">
+      <button class="mbtn on" id="m-timed" onclick="setMode('timed')">⏱ Timed</button>
+      <button class="mbtn" id="m-practice" onclick="setMode('practice')">◎ Practice</button>
+      <button class="mbtn" id="m-review" onclick="setMode('review')">✦ Instant Feedback</button>
+    </div>
+    <button class="btn btn-ac" style="font-size:12px;padding:13px 36px" onclick="startExam()">Start Domain 2 Exam →</button>
+  </div>
+</div>
+
+<div id="s-exam" class="screen">
+  <div class="topbar">
+    <div class="topbar-info">Q <span id="qc">1</span>/30 &nbsp;·&nbsp; Done: <span id="ac">0</span></div>
+    <div class="timer" id="timer">1:00:00</div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:3.3%"></div></div>
+  <div id="qgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div id="dtag" class="dtag">Domain 2 · Data Store Management</div>
+    <div id="qmeta" class="qmeta"></div>
+    <div id="qtext" class="qtext"></div>
+    <div id="opts" class="opts"></div>
+    <div id="exp" class="exp"></div>
+    <div class="nav">
+      <button class="btn" id="pbtn" onclick="go(-1)">← Prev</button>
+      <button class="btn" id="fbtn" onclick="flagQ()">⚑ Flag</button>
+      <button class="btn btn-ac" id="nbtn" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-dn" onclick="doSubmit()">Submit Exam</button>
+  </div>
+</div>
+
+<div id="s-results" class="screen">
+  <div class="qcard">
+    <div class="rtop">
+      <div class="sring" id="sring">
+        <div class="snum" id="snum">—</div>
+        <div class="slbl">scaled</div>
+      </div>
+      <div class="verd" id="verd"></div>
+      <div class="rsub" id="rsub"></div>
+    </div>
+    <div class="rbtns">
+      <button class="btn btn-gn" onclick="goRev()">Review Answers</button>
+      <button class="btn btn-ac" onclick="reset()">Retake</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-review" class="screen">
+  <div class="rvhdr">
+    <span class="rvmeta">Review · Q <span id="rvc">1</span>/30</span>
+    <span class="rvmeta" id="rvscr"></span>
+  </div>
+  <div id="rvgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div class="dtag">Domain 2 · Data Store Management</div>
+    <div id="rvmeta" class="qmeta"></div>
+    <div id="rvtext" class="qtext"></div>
+    <div id="rvopts" class="opts"></div>
+    <div id="rvexp" class="exp show"></div>
+    <div class="nav">
+      <button class="btn" id="rvpb" onclick="rvGo(-1)">← Prev</button>
+      <button class="btn" onclick="showS('s-results')">Results</button>
+      <button class="btn btn-ac" id="rvnb" onclick="rvGo(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const TOTAL=30;
+const MINS=1;
+const Q=[
+  {t:"A company stores user clickstream data in S3 partitioned as s3://bucket/year/month/day/hour/. An Athena query filters by a specific date range (2024-01-01 to 2024-01-31). Why does Athena scan less data than an unpartitioned equivalent?",o:["S3 compresses data more efficiently with date-based prefixes", "Athena uses the partition metadata in the Glue Data Catalog to skip all partitions outside the date range \u2014 only matching prefixes are listed and read", "Athena caches results from previous date queries", "Date-partitioned data is automatically converted to Parquet by S3"],a:1,e:"Partition pruning is the core benefit. Athena's query planner reads the partition metadata from the Glue Data Catalog, identifies only the partitions matching the date filter, and reads only those S3 prefixes. All other partitions are skipped entirely \u2014 dramatically reducing bytes scanned and cost."},
+  {t:"A Redshift table has a DISTKEY on customer_id but queries joining this table to a large orders table on order_id are slow due to data redistribution. What is the correct fix?",o:["Add a SORTKEY on customer_id", "Change the DISTKEY to order_id to match the join key, eliminating redistribution during the join", "Switch to ALL distribution", "Enable Concurrency Scaling"],a:1,e:"Redistribution occurs when joined rows are on different compute nodes. Setting the DISTKEY to the join column (order_id) ensures matching rows from both tables land on the same node \u2014 joins are then local with zero redistribution. The DISTKEY must match the most frequent large-table join column."},
+  {t:"A company's DynamoDB table stores order items. Each order has multiple items (one-to-many). The access pattern is: 'get all items for order_id X sorted by item_number'. How should the table be keyed?",o:["Use item_id as the partition key only \u2014 no sort key", "Use order_id as partition key and item_number as sort key \u2014 enables efficient range queries for all items per order sorted by item_number", "Use a GSI on item_number for sorting", "Store items as a list attribute inside a single order item"],a:1,e:"DynamoDB's composite primary key (partition key + sort key) is the correct model. order_id as partition key groups all items for an order in the same partition. item_number as sort key enables sorted range reads (Query on order_id, sorted ascending by item_number) with optimal efficiency."},
+  {t:"A company stores 20 TB of financial data in Amazon S3 Standard. Data older than 90 days is rarely accessed, and data older than 1 year is almost never accessed. Which S3 configuration minimizes storage cost?",o:["Keep all data in S3 Standard", "S3 Lifecycle rule: transition to Standard-IA at 90 days, then to Glacier Flexible Retrieval at 365 days", "Enable S3 Intelligent-Tiering from day one", "Delete data older than 1 year using lifecycle expiration"],a:1,e:"Lifecycle rules match this exact known access pattern: Standard (0-90 days, frequent access) \u2192 Standard-IA (90-365 days, infrequent) \u2192 Glacier Flexible Retrieval (365+ days, rare/archival). S3 Intelligent-Tiering adds per-object monitoring fees and is better suited for unpredictable access patterns."},
+  {t:"A DynamoDB table experiences write throttling during daily batch imports. The table uses Provisioned capacity with 5,000 WCU. The batch writes 10 million items. What is the recommended DynamoDB feature to handle this without over-provisioning?",o:["Switch to On-Demand capacity permanently", "Enable DynamoDB Auto Scaling with a target utilization of 70%", "Use DynamoDB Transactions for the bulk write", "Increase provisioned WCU to 100,000"],a:1,e:"DynamoDB Auto Scaling monitors consumed capacity and automatically adjusts provisioned WCU/RCU within defined min/max bounds. During the batch import it scales up; during idle periods it scales back down. This handles spikes without permanent over-provisioning."},
+  {t:"A company needs to run SQL queries against their Amazon S3 data lake but also wants to join S3 data with live Amazon RDS tables in a single query. Which service supports this federated join without data movement?",o:["Amazon Redshift with COPY from S3 and RDS", "Amazon Athena with Federated Query \u2014 use the RDS connector Lambda alongside S3 tables", "AWS Glue job joining JDBC and S3 sources", "Amazon QuickSight with multiple data sources"],a:1,e:"Athena Federated Query uses pre-built Lambda connectors (e.g., the Amazon RDS/MySQL connector) to push down queries to RDS and join results with S3 data in a single SQL statement. No data is moved \u2014 the join happens in Athena's distributed query engine."},
+  {t:"An Aurora PostgreSQL cluster is used for OLTP. Analytics teams run long-running reporting queries that consume all CPU and impact OLTP latency. What is the most cost-effective solution that does not require application code changes?",o:["Upgrade to a larger Aurora instance class", "Add an Aurora Read Replica and configure the reporting tool to connect to the replica endpoint", "Enable Aurora Serverless v2 for the main instance", "Create a separate RDS instance for reporting"],a:1,e:"Aurora Read Replicas serve read traffic from a separate compute instance, completely isolating reporting query CPU consumption from the writer. The replica endpoint is a separate DNS name \u2014 point the reporting tool there. No application code changes to the OLTP path are needed."},
+  {t:"A company uses Amazon ElastiCache for Redis to cache database query results. Cache hit rates are low because cache keys expire too quickly. The team wants items to stay cached until the underlying database data changes. What is the correct caching strategy?",o:["Increase the TTL to 24 hours on all cached items", "Implement a write-through or cache-aside pattern: invalidate/update the cache key whenever the database record changes", "Switch from Redis to Memcached for better TTL management", "Increase the ElastiCache node size"],a:1,e:"Long TTLs serve stale data. The correct approach is cache invalidation on write: when the database record changes, the application simultaneously updates (write-through) or deletes (cache-aside) the corresponding cache key. Items stay cached indefinitely until the underlying data changes."},
+  {t:"A company is designing a Redshift schema for a retail data warehouse. The sales fact table (500 GB) is frequently joined with a date dimension table (365 rows). Which Redshift distribution strategy is optimal for the dimension table?",o:["DISTKEY on date_id", "EVEN distribution", "ALL distribution \u2014 copies the table to every compute node", "AUTO distribution"],a:2,e:"For very small dimension tables (365 rows is tiny), ALL distribution copies the entire table to every compute node. Joins to the fact table are then completely local \u2014 no data redistribution needed. DISTKEY only helps if the fact table has the same distribution, which adds maintenance overhead for a 365-row table."},
+  {t:"A company needs to ensure a specific Amazon S3 bucket is never publicly accessible, even if a bucket policy or ACL is accidentally misconfigured. Which S3 feature provides this safeguard?",o:["S3 Default Encryption", "S3 Block Public Access settings at the bucket level (BlockPublicAcls, BlockPublicPolicy, IgnorePublicAcls, RestrictPublicBuckets)", "S3 Versioning", "S3 Object Lock"],a:1,e:"S3 Block Public Access has four independent settings. With all four enabled at the bucket level, S3 ignores any ACL or policy that would grant public access \u2014 even if someone accidentally adds a public ACL or policy, Block Public Access overrides it and the bucket remains private."},
+  {t:"A DynamoDB table stores IoT device state. A Lambda function reads the SAME 100 device records every second for monitoring. DynamoDB read costs are very high. Which solution eliminates the repeated reads most effectively?",o:["Switch the table to On-Demand capacity mode", "Add a DynamoDB Accelerator (DAX) cluster between Lambda and DynamoDB", "Enable DynamoDB Global Tables", "Use DynamoDB Streams to push updates to the Lambda function"],a:1,e:"DAX is an in-memory read-through cache for DynamoDB. For the same 100 records read every second, DAX serves all reads from its cache (microsecond latency) after the first cache population. DynamoDB only receives cache-miss reads \u2014 reducing DynamoDB RCU consumption by 99%+ for this access pattern."},
+  {t:"A company creates a new Amazon Redshift cluster with 4 nodes. They load 10 TB of data. VACUUM and ANALYZE have not been run. Queries are slower than expected. What is the most likely cause?",o:["The cluster needs more nodes for this data size", "Table statistics are stale (ANALYZE not run) \u2014 the query planner uses suboptimal execution plans without accurate statistics", "The data must be re-partitioned across 4 nodes", "Enhanced VPC Routing is not enabled"],a:1,e:"After loading data, ANALYZE must be run to update table statistics (row counts, data distributions, column cardinality). The Redshift query planner uses these statistics to choose join strategies, sort orders, and distribution. Stale or missing statistics cause the planner to make poor decisions."},
+  {t:"A company's data lake uses S3 as storage and AWS Glue Data Catalog for schemas. An analyst needs to query the last 90 days of records. The data is partitioned by year/month/day. Which Athena query structure ensures only 90 days of partitions are scanned?",o:["SELECT * FROM table WHERE record_date >= current_date - 90", "SELECT * FROM table WHERE year >= '2024' AND month >= '01' AND day >= '01' using exact partition column filters matching the S3 prefix structure", "SELECT * FROM table LIMIT 1000000", "Add a row-level WHERE clause on a non-partitioned timestamp column"],a:1,e:"Athena partition pruning requires filtering on the actual partition columns (year, month, day) using values that map to S3 prefixes. Filtering on a non-partition column (like a record_date field inside the file) forces a full scan \u2014 Athena cannot prune using values it has not yet read from the files."},
+  {t:"A company needs multi-region active-active replication for a DynamoDB table that serves a global user base. If the us-east-1 region fails, users in eu-west-1 must continue writing with no application changes. Which DynamoDB feature provides this?",o:["DynamoDB point-in-time recovery", "DynamoDB Global Tables with replicas in both regions \u2014 both replicas are readable and writable", "DynamoDB Cross-Region Backup", "DynamoDB Streams with manual Lambda replication"],a:1,e:"DynamoDB Global Tables provide multi-region, active-active replication. Both regional replicas accept reads and writes. If us-east-1 fails, the application automatically (or via Route 53 health checks) routes to the eu-west-1 replica, which already has all the data \u2014 no application code changes needed."},
+  {t:"A company stores semi-structured telemetry records in Amazon S3. Some records have 5 fields; others have 50 fields. The schema changes weekly as new telemetry types are added. Which data format best handles this schema variability?",o:["CSV \u2014 always use the maximum number of columns", "Parquet with strict schema enforcement", "JSON \u2014 schema-less and naturally handles variable fields per record", "Fixed-width text format"],a:2,e:"JSON is schema-flexible by nature \u2014 each record can have a different set of fields. It is the natural format for semi-structured data with variable schemas. While Parquet is better for analytics performance, it requires a defined schema. For variable telemetry during exploration, JSON is appropriate."},
+  {t:"A data engineer must ensure that Amazon Redshift tables are re-sorted after large data loads. Historically this required manual VACUUM SORT operations. What is the modern, managed alternative?",o:["Schedule VACUUM SORT via EventBridge every Sunday", "Enable Automatic Table Optimization (ATO) \u2014 Redshift automatically runs VACUUM SORT and ANALYZE during idle periods", "Use Redshift Spectrum instead of local tables", "Run VACUUM REINDEX instead of VACUUM SORT"],a:1,e:"Redshift's Automatic Table Optimization (ATO) analyzes query patterns and automatically applies VACUUM and ANALYZE operations during cluster idle time. It also automatically chooses sort keys and distribution styles. ATO eliminates the need for manual maintenance scheduling."},
+  {t:"A company uses Amazon S3 for data lake storage. Objects are written once and read many times. A new compliance requirement mandates that objects cannot be overwritten or deleted for 5 years. Which S3 feature enforces this?",o:["S3 Versioning only", "S3 MFA Delete", "S3 Object Lock with COMPLIANCE mode and a 5-year retention period", "S3 Replication to a second bucket"],a:2,e:"S3 Object Lock in COMPLIANCE mode sets a retention period that no user \u2014 including root \u2014 can shorten or override. Objects cannot be overwritten or deleted until the retention period expires. GOVERNANCE mode also exists but allows privileged users to override it. For strict compliance, COMPLIANCE mode is required."},
+  {t:"A company has an Amazon Aurora MySQL cluster. During disaster recovery testing, they need to restore the database to its state exactly 2 hours ago. Which Aurora feature enables point-in-time restoration?",o:["Aurora automated backups allow restore to any second within the backup retention window (up to 35 days)", "Aurora Read Replica promotion", "Aurora Global Database failover", "Manual snapshot from 2 hours ago (if one was taken)"],a:0,e:"Aurora automated backups (continuous backup to S3 using transaction logs) support point-in-time restore (PITR) to any second within the backup retention window (1-35 days). Restoration creates a new cluster at the specified point in time \u2014 no manual snapshot is required."},
+  {t:"A company uses AWS Lake Formation to manage a data lake. A new data scientist needs access to a table, but only for rows where the 'department' column equals their department ID. Which Lake Formation feature provides this row-level isolation?",o:["IAM policy with S3 path conditions", "Lake Formation Data Filters \u2014 define a filter on department = 'data_science' and assign it to the data scientist's IAM role", "Column-level permissions on the department column", "S3 prefix per department"],a:1,e:"Lake Formation Data Filters apply row-level security at query time. A filter defined as 'department = data_science' is assigned to the IAM role \u2014 when the data scientist queries the table via Athena, Lake Formation automatically appends this filter, making other departments' rows invisible."},
+  {t:"A company uses Amazon Redshift for analytics. A specific query joins three large tables and runs for 45 minutes. The EXPLAIN plan shows 'DS_BCAST_INNER' (broadcast join) for a 200 GB table. What does this indicate and what is the fix?",o:["DS_BCAST_INNER is optimal for large tables \u2014 no change needed", "DS_BCAST_INNER means one table is being broadcast to all nodes \u2014 for a 200 GB table this is extremely slow. Change the DISTKEY to the join column to enable a DS_DIST_NONE (co-located) join", "Increase cluster node count to reduce broadcast time", "Enable Concurrency Scaling"],a:1,e:"DS_BCAST_INNER broadcasting a 200 GB table to all nodes is extremely expensive. It means the table's distribution doesn't match the join key. Setting the DISTKEY on the join column for both tables enables DS_DIST_NONE \u2014 rows are co-located on the same node and the join requires no data movement."},
+  {t:"A company has 50 different AWS accounts sharing a data lake in a central S3 bucket. They need to control which account can access which databases and tables without managing S3 bucket policies across 50 accounts. Which AWS service provides this cross-account data catalog sharing?",o:["S3 Cross-Account Replication", "AWS Resource Access Manager (RAM) with Glue Data Catalog resources", "AWS Lake Formation cross-account grants", "IAM roles with trust policies across accounts"],a:2,e:"AWS Lake Formation supports cross-account grants on Glue Data Catalog databases and tables. The data lake administrator grants specific databases/tables to specific external account principals. The recipient account's users query via Athena with Lake Formation enforcing access \u2014 no S3 policy changes needed."},
+  {t:"A company uses Amazon OpenSearch Service for full-text log search. Indices grow to 500 GB within 7 days. After 7 days, logs are rarely searched. Storage costs are high because all data stays on hot nodes. What is the best architectural improvement?",o:["Increase hot node instance size", "Configure UltraWarm (warm) storage \u2014 automatically move indices older than 7 days to warm storage at 90% lower cost", "Delete indices older than 7 days", "Switch to Amazon CloudWatch Logs instead"],a:1,e:"OpenSearch UltraWarm nodes use S3-backed storage at significantly lower cost than hot SSD nodes, while still being searchable. Using Index State Management (ISM) to automatically move indices to UltraWarm after 7 days keeps recent data fast and archival data queryable at much lower cost."},
+  {t:"A company uses Amazon Redshift. Analysts complain that some queries run fast but others of similar complexity take 10x longer. The slow queries are from a specific team that submits very large analytical queries. What Redshift feature creates isolation between teams?",o:["Create separate Redshift clusters per team", "Configure WLM (Workload Management) queues \u2014 assign each team to a queue with dedicated memory allocation and concurrency limits", "Enable Concurrency Scaling for the slow team's queries", "Add more Redshift nodes"],a:1,e:"WLM (Workload Management) creates separate query queues with configurable memory percentages and query slot counts. Assigning the large-query team to a separate queue with bounded memory prevents their queries from monopolizing resources and impacting other teams."},
+  {t:"A company needs to store and query time-series metrics (CPU, memory, latency) for 10,000 servers, with queries typically filtering by server_id and time range. They need automatic data expiration after 30 days. Which AWS database is purpose-built for this?",o:["Amazon DynamoDB with TTL", "Amazon RDS PostgreSQL with TimescaleDB extension", "Amazon Timestream", "Amazon Redshift"],a:2,e:"Amazon Timestream is purpose-built for time-series data. It has a built-in time-series query engine optimized for time-range filters, automatic data tiering (memory \u2192 magnetic storage), and configurable data retention policies (e.g., 30-day magnetic retention). No manual TTL management or index tuning required."},
+  {t:"A company migrated from on-premises Oracle to Amazon Aurora PostgreSQL. After migration, specific queries that used Oracle's ROWNUM for pagination are failing. Which PostgreSQL-compatible approach replaces Oracle's ROWNUM?",o:["Use ROW_NUMBER() OVER() window function in PostgreSQL/Aurora", "Aurora does not support pagination \u2014 use application-side pagination", "Use Aurora's ORACLE_COMPAT mode", "Use LIMIT/OFFSET for pagination or ROW_NUMBER() for ranked pagination"],a:3,e:"PostgreSQL (and Aurora PostgreSQL) uses LIMIT/OFFSET for simple pagination and ROW_NUMBER() OVER (ORDER BY ...) for rank-based pagination \u2014 equivalent to Oracle's ROWNUM pattern. Both work natively in Aurora PostgreSQL without any compatibility modes."},
+  {t:"A company stores 2 TB of frequently-accessed analytical data in Amazon S3 as CSV files. Athena queries scan the entire dataset because there are no partitions. Which TWO changes provide the greatest query performance and cost improvement?",o:["Convert CSV to Parquet format", "Enable S3 Transfer Acceleration", "Partition the data by the most common query filter column (e.g., date)", "Enable S3 Versioning for data lineage"],a:0,e:"(Multiple answer) Converting to Parquet (columnar format) reduces bytes scanned by reading only queried columns. Partitioning by the common filter column (date) allows Athena to skip non-matching partitions entirely. Together, these two changes typically reduce Athena query cost by 80-95%."},
+  {t:"A company's DynamoDB table handles 100,000 writes per second. The table uses On-Demand capacity. Costs are high. They analyze traffic and find it is very consistent \u2014 always between 80,000 and 120,000 writes per second. What reduces cost without risk of throttling?",o:["Switch to Provisioned capacity with 120,000 WCU and DynamoDB Auto Scaling between 80,000 and 130,000 WCU", "Switch to Provisioned at 80,000 WCU (minimum observed) without Auto Scaling", "Keep On-Demand \u2014 it is always cheaper for consistent workloads", "Switch to DynamoDB Global Tables"],a:0,e:"For predictable, consistent traffic, Provisioned capacity with Auto Scaling is significantly cheaper than On-Demand (typically 2-3x cost reduction). Setting the target at 120,000 WCU with Auto Scaling bounds of 80,000-130,000 handles the observed range without throttling while eliminating On-Demand premiums."},
+  {t:"A company uses Amazon Redshift. A critical table that powers executive dashboards takes 30 minutes to query. The table is 800 GB, unsorted, with no distribution key set. Which Redshift optimization most improves this query?",o:["Enable Concurrency Scaling", "Add a SORTKEY on the most common filter column and run VACUUM SORT to sort existing data", "Increase cluster size", "Switch to Redshift Serverless"],a:1,e:"A SORTKEY allows Redshift's zone maps to skip entire 1 MB blocks that don't match the filter predicate. For a large table filtered by a common column (e.g., date), a SORTKEY on that column plus VACUUM SORT (to physically sort existing data) can reduce query time from 30 minutes to seconds."},
+  {t:"A company uses S3 to store raw data ingested from multiple sources. They need to prevent any object from being accidentally deleted by an application bug. Deletion must require explicit human approval. Which S3 feature protects against accidental programmatic deletion?",o:["S3 Block Public Access", "S3 Versioning with MFA Delete enabled \u2014 DELETE requests require a valid MFA token", "S3 Object Lock in GOVERNANCE mode", "S3 Replication to a second bucket"],a:1,e:"S3 Versioning with MFA Delete requires a valid MFA token to permanently delete an object version or disable versioning. Application code cannot perform these operations without the physical MFA device \u2014 accidental or malicious programmatic deletion is blocked."},
+  {t:"An analyst uses Athena to query a Glue Data Catalog table pointing to S3 Parquet data. New partitions are added to S3 every hour by a Glue ETL job. Athena does not see the new partitions without manual MSCK REPAIR TABLE. What automates partition discovery?",o:["Enable S3 Event Notifications on the bucket", "Configure the Glue ETL job to run glueContext.getSink() with enableUpdateCatalog=True, or schedule a Glue Crawler after the ETL job to update the catalog", "Enable Athena Query Result Reuse", "Run MSCK REPAIR TABLE in a Lambda triggered by S3 events"],a:1,e:"The cleanest approaches: (1) Configure the Glue ETL job with catalog update options (enableUpdateCatalog=True) so it adds partitions as it writes, or (2) schedule a Glue Crawler to run after the ETL job. Both automatically register new partitions in the Glue Data Catalog \u2014 no manual MSCK REPAIR TABLE needed."},
+];
+
+let mode='timed',cur=0,ans=new Array(TOTAL).fill(null),flags=new Set(),ti=null,tLeft=TOTAL*2*60,done=false,rv=0;
+
+function setMode(m){mode=m;['timed','practice','review'].forEach(x=>document.getElementById('m-'+x).classList.toggle('on',x===m));}
+
+function showS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function startExam(){
+  ans=new Array(TOTAL).fill(null);flags=new Set();cur=0;done=false;tLeft=TOTAL*2*60;
+  buildGrid('qgrid');renderQ();showS('s-exam');
+  if(mode==='timed')startTimer();
+  else document.getElementById('timer').textContent='◎ No Limit';
+}
+
+function startTimer(){
+  clearInterval(ti);
+  ti=setInterval(()=>{
+    tLeft--;
+    const h=Math.floor(tLeft/3600),m=Math.floor((tLeft%3600)/60),s=tLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    el.className='timer'+(tLeft<180?' danger':tLeft<480?' warn':'');
+    if(tLeft<=0){clearInterval(ti);doSubmit();}
+  },1000);
+}
+
+function buildGrid(gid){
+  const g=document.getElementById(gid);g.innerHTML='';
+  const isRv=gid==='rvgrid',c=isRv?rv:cur;
+  Q.forEach((_,i)=>{
+    const d=document.createElement('div');
+    let cl='qdot';
+    if(i===c)cl+=' cur';
+    if(isRv){cl+=ans[i]===Q[i].a?' r-right':ans[i]!==null?' r-wrong':' r-skip';}
+    else{if(ans[i]!==null)cl+=' done';if(flags.has(i))cl+=' flagged';}
+    d.className=cl;d.textContent=i+1;
+    d.onclick=()=>{if(isRv){rv=i;renderRev();}else{cur=i;renderQ();}};
+    g.appendChild(d);
+  });
+}
+
+function renderQ(){
+  const q=Q[cur];
+  document.getElementById('qc').textContent=cur+1;
+  document.getElementById('ac').textContent=ans.filter(a=>a!==null).length;
+  document.getElementById('prog').style.width=((cur+1)/TOTAL*100)+'%';
+  document.getElementById('qmeta').textContent='Question '+(cur+1)+' of '+TOTAL+(flags.has(cur)?' · ⚑ Flagged':'');
+  document.getElementById('qtext').textContent=q.t;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    const sel=ans[cur]===i,rv2=done||mode==='review';
+    if(rv2)d.className='opt locked'+(i===q.a?' correct':sel&&i!==q.a?' wrong':'');
+    else d.className='opt'+(sel?' sel':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    if(!done&&mode!=='review')d.onclick=()=>pick(i);
+    oc.appendChild(d);
+  });
+  const eb=document.getElementById('exp');
+  if(done||mode==='review'){eb.innerHTML='<b>Explanation:</b> '+q.e;eb.className='exp show';}
+  else eb.className='exp';
+  document.getElementById('pbtn').disabled=cur===0;
+  document.getElementById('fbtn').textContent=flags.has(cur)?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('nbtn').textContent=cur===TOTAL-1?'Finish →':'Next →';
+  buildGrid('qgrid');
+}
+
+function pick(i){
+  if(done)return;
+  ans[cur]=i;renderQ();
+  if(mode==='review'){const eb=document.getElementById('exp');eb.innerHTML='<b>Explanation:</b> '+Q[cur].e;eb.className='exp show';}
+}
+
+function go(d){
+  if(cur+d>=0&&cur+d<TOTAL){cur+=d;renderQ();}
+  else if(d>0&&cur===TOTAL-1)doSubmit();
+}
+
+function flagQ(){flags.has(cur)?flags.delete(cur):flags.add(cur);renderQ();}
+
+function doSubmit(){
+  clearInterval(ti);done=true;
+  const cor=ans.filter((a,i)=>a===Q[i].a).length;
+  const sc=Math.round(100+(cor/TOTAL)*900);
+  const pass=sc>=720;
+  document.getElementById('snum').textContent=sc;
+  document.getElementById('snum').className='snum '+(pass?'pass':'fail');
+  document.getElementById('sring').className='sring '+(pass?'pass':'fail');
+  document.getElementById('verd').textContent=pass?'PASS ✓':'Not Passing Yet';
+  document.getElementById('verd').className='verd '+(pass?'pass':'fail');
+  document.getElementById('rsub').textContent=cor+'/'+TOTAL+' correct · '+Math.round(cor/TOTAL*100)+'% · Threshold: 720 scaled';
+  showS('s-results');
+}
+
+function goRev(){
+  rv=0;
+  document.getElementById('rvscr').textContent=ans.filter((a,i)=>a===Q[i].a).length+'/'+TOTAL+' correct';
+  buildGrid('rvgrid');renderRev();showS('s-review');
+}
+
+function renderRev(){
+  const q=Q[rv];
+  document.getElementById('rvc').textContent=rv+1;
+  const st=ans[rv]===q.a?'✓ Correct':ans[rv]!==null?'✗ Incorrect':'— Skipped';
+  const sc2=ans[rv]===q.a?'#3fcf8e':ans[rv]!==null?'#f25c54':'#7a8394';
+  document.getElementById('rvmeta').innerHTML='Question '+(rv+1)+' — <span style="color:'+sc2+';font-weight:600">'+st+'</span>';
+  document.getElementById('rvtext').textContent=q.t;
+  const oc=document.getElementById('rvopts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt locked'+(i===q.a?' correct':ans[rv]===i?' wrong':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    oc.appendChild(d);
+  });
+  document.getElementById('rvexp').innerHTML='<b>Explanation:</b> '+q.e;
+  document.getElementById('rvpb').disabled=rv===0;
+  document.getElementById('rvnb').textContent=rv===TOTAL-1?'Done →':'Next →';
+  buildGrid('rvgrid');
+}
+
+function rvGo(d){
+  if(rv+d>=0&&rv+d<TOTAL){rv+=d;renderRev();}
+  else if(d>0)showS('s-results');
+}
+
+function reset(){showS('s-start');}
+</script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEA-C01 · Domain 3 Exam</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d0f12;--surf:#13161b;--surf2:#1a1e25;--surf3:#21262f;
+  --bdr:#2a2f3a;--bdr2:#343b48;--text:#e8eaf0;--muted:#7a8394;
+  --accent:#3fcf8e;--accent2:#1fa86e;--green:#3fcf8e;--red:#f25c54;--blue:#5b9cf6;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh}
+#app{max-width:840px;margin:0 auto;padding:24px 16px 60px}
+.screen{display:none}.screen.active{display:block;animation:fu .25s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:16px}
+.timer{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent);letter-spacing:2px}
+.timer.warn{color:#ef9f27}.timer.danger{color:var(--red);animation:bl 1s step-end infinite}
+@keyframes bl{50%{opacity:.4}}
+.topbar-info{font-size:12px;color:var(--muted);font-family:var(--mono)}
+
+.prog-track{height:3px;background:var(--bdr);border-radius:2px;margin-bottom:16px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .35s}
+
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(32px,1fr));gap:4px;margin-bottom:16px}
+.qdot{font-family:var(--mono);font-size:10px;font-weight:600;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;cursor:pointer;border:1px solid var(--bdr);background:var(--surf);color:var(--muted);transition:all .12s}
+.qdot:hover{border-color:var(--bdr2);color:var(--text)}
+.qdot.done{background:#1f2410;border-color:#3fcf8e55;color:var(--accent)}
+.qdot.cur{border:1.5px solid var(--accent);color:var(--accent);background:var(--surf2)}
+.qdot.flagged{border-color:#ef9f27;color:#ef9f27}
+.qdot.r-right{background:#1a2e22;border-color:var(--green);color:var(--green)}
+.qdot.r-wrong{background:#2a1818;border-color:var(--red);color:var(--red)}
+.qdot.r-skip{background:var(--surf);border-color:var(--bdr);color:var(--muted)}
+
+.qcard{background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:22px;margin-bottom:14px}
+.dtag{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:#081410;border:1px solid #0e2a1a;border-radius:4px;padding:3px 10px;margin-bottom:12px}
+.qmeta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-bottom:6px}
+.qtext{font-size:15px;line-height:1.7;color:var(--text);margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border:1px solid var(--bdr);border-radius:7px;cursor:pointer;background:var(--surf2);transition:all .12s}
+.opt:hover:not(.locked){border-color:var(--bdr2);background:var(--surf3)}
+.opt.sel{border-color:var(--accent);background:#081410}
+.opt.correct{border-color:var(--green);background:#122018}
+.opt.wrong{border-color:var(--red);background:#200e0e}
+.opt.locked{cursor:default}
+.ok{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted);min-width:16px;padding-top:1px}
+.opt.sel .ok{color:var(--accent)}.opt.correct .ok{color:var(--green)}.opt.wrong .ok{color:var(--red)}
+.ot{font-size:14px;color:var(--text);line-height:1.5}
+
+.exp{display:none;padding:13px 15px;border-radius:7px;background:var(--surf2);border-left:3px solid var(--blue);font-size:13px;line-height:1.7;color:#9eb3cc;margin-bottom:14px}
+.exp.show{display:block;animation:fu .2s ease}
+.exp b{color:var(--blue)}
+
+.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.5px;padding:9px 18px;border-radius:6px;border:1px solid var(--bdr2);background:var(--surf2);color:var(--muted);cursor:pointer;transition:all .12s;text-transform:uppercase}
+.btn:hover{border-color:var(--text);color:var(--text)}
+.btn:disabled{opacity:.3;cursor:default}
+.btn-ac{border-color:var(--accent);color:var(--accent);background:#081410}
+.btn-ac:hover{background:#0e2a1a}
+.btn-dn{border-color:#5a2020;color:#c06060}
+.btn-dn:hover{border-color:var(--red);color:var(--red);background:#1a0808}
+.btn-gn{border-color:var(--green);color:var(--green);background:#0e1e16}
+.btn-gn:hover{background:#162a1e}
+
+.hero{text-align:center;padding:36px 0 28px}
+.kicker{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.htitle{font-size:32px;font-weight:300;color:var(--text);margin-bottom:4px;letter-spacing:-1px}
+.htitle span{font-weight:600;color:var(--accent)}
+.hsub{font-size:13px;color:var(--muted);margin-bottom:24px;max-width:480px;margin-left:auto;margin-right:auto}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:400px;margin:0 auto 24px}
+.stat{background:var(--surf);border:1px solid var(--bdr);border-radius:8px;padding:14px;text-align:center}
+.sv{font-family:var(--mono);font-size:24px;font-weight:600;color:var(--accent)}
+.sl{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.modes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.mbtn{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;padding:10px 20px;border-radius:7px;border:1px solid var(--bdr2);background:var(--surf);color:var(--muted);cursor:pointer;transition:all .18s}
+.mbtn:hover{border-color:var(--text);color:var(--text)}
+.mbtn.on{border-color:var(--accent);color:var(--accent);background:#081410}
+
+.rtop{text-align:center;padding:28px 0 20px}
+.sring{width:120px;height:120px;border-radius:50%;margin:0 auto 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.sring::before{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid var(--bdr)}
+.sring.pass::after,.sring.fail::after{content:'';position:absolute;inset:0;border-radius:50%;border:4px solid transparent}
+.sring.pass::after{border-color:var(--green)}.sring.fail::after{border-color:var(--red)}
+.snum{font-family:var(--mono);font-size:38px;font-weight:600}
+.snum.pass{color:var(--green)}.snum.fail{color:var(--red)}
+.slbl{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
+.verd{font-size:20px;font-weight:600;margin-bottom:5px}
+.verd.pass{color:var(--green)}.verd.fail{color:var(--red)}
+.rsub{font-size:12px;color:var(--muted);margin-bottom:22px;font-family:var(--mono)}
+.rbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+
+.rvhdr{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;margin-bottom:14px}
+.rvmeta{font-family:var(--mono);font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="s-start" class="screen active">
+  <div class="hero">
+    <div class="kicker">DEA-C01 Domain Focus Exam</div>
+    <h1 class="htitle">Domain 3: <span>Data Operations & Support</span></h1>
+    <p class="hsub">Step Functions, EventBridge, CloudWatch, Athena, data quality, monitoring, orchestration</p>
+    <div class="stats">
+      <div class="stat"><div class="sv">30</div><div class="sl">Questions</div></div>
+      <div class="stat"><div class="sv">22%</div><div class="sl">Exam weight</div></div>
+      <div class="stat"><div class="sv">720</div><div class="sl">Pass score</div></div>
+    </div>
+    <div class="modes">
+      <button class="mbtn on" id="m-timed" onclick="setMode('timed')">⏱ Timed</button>
+      <button class="mbtn" id="m-practice" onclick="setMode('practice')">◎ Practice</button>
+      <button class="mbtn" id="m-review" onclick="setMode('review')">✦ Instant Feedback</button>
+    </div>
+    <button class="btn btn-ac" style="font-size:12px;padding:13px 36px" onclick="startExam()">Start Domain 3 Exam →</button>
+  </div>
+</div>
+
+<div id="s-exam" class="screen">
+  <div class="topbar">
+    <div class="topbar-info">Q <span id="qc">1</span>/30 &nbsp;·&nbsp; Done: <span id="ac">0</span></div>
+    <div class="timer" id="timer">1:00:00</div>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:3.3%"></div></div>
+  <div id="qgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div id="dtag" class="dtag">Domain 3 · Data Operations & Support</div>
+    <div id="qmeta" class="qmeta"></div>
+    <div id="qtext" class="qtext"></div>
+    <div id="opts" class="opts"></div>
+    <div id="exp" class="exp"></div>
+    <div class="nav">
+      <button class="btn" id="pbtn" onclick="go(-1)">← Prev</button>
+      <button class="btn" id="fbtn" onclick="flagQ()">⚑ Flag</button>
+      <button class="btn btn-ac" id="nbtn" onclick="go(1)">Next →</button>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:8px">
+    <button class="btn btn-dn" onclick="doSubmit()">Submit Exam</button>
+  </div>
+</div>
+
+<div id="s-results" class="screen">
+  <div class="qcard">
+    <div class="rtop">
+      <div class="sring" id="sring">
+        <div class="snum" id="snum">—</div>
+        <div class="slbl">scaled</div>
+      </div>
+      <div class="verd" id="verd"></div>
+      <div class="rsub" id="rsub"></div>
+    </div>
+    <div class="rbtns">
+      <button class="btn btn-gn" onclick="goRev()">Review Answers</button>
+      <button class="btn btn-ac" onclick="reset()">Retake</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-review" class="screen">
+  <div class="rvhdr">
+    <span class="rvmeta">Review · Q <span id="rvc">1</span>/30</span>
+    <span class="rvmeta" id="rvscr"></span>
+  </div>
+  <div id="rvgrid" class="qgrid"></div>
+  <div class="qcard">
+    <div class="dtag">Domain 3 · Data Operations & Support</div>
+    <div id="rvmeta" class="qmeta"></div>
+    <div id="rvtext" class="qtext"></div>
+    <div id="rvopts" class="opts"></div>
+    <div id="rvexp" class="exp show"></div>
+    <div class="nav">
+      <button class="btn" id="rvpb" onclick="rvGo(-1)">← Prev</button>
+      <button class="btn" onclick="showS('s-results')">Results</button>
+      <button class="btn btn-ac" id="rvnb" onclick="rvGo(1)">Next →</button>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+const TOTAL=30;
+const MINS=1;
+const Q=[
+  {t:"A data pipeline uses AWS Step Functions. One task calls an external API that sometimes returns a 429 (rate limit) error. The team wants to retry up to 4 times, waiting 10 seconds after the first failure and doubling the wait time on each subsequent retry. Which Step Functions configuration achieves this?",o:["Add a Wait state before each Task retry", "Configure a Retry block on the Task state: MaxAttempts=4, IntervalSeconds=10, BackoffRate=2.0", "Use a Choice state after each API call to check the status code", "Use an Express Workflow with 4 parallel Task states"],a:1,e:"Step Functions Retry block parameters: MaxAttempts controls total retry attempts; IntervalSeconds sets the initial wait; BackoffRate is the multiplier applied to each subsequent wait (2.0 = exponential backoff). Waits: 10s, 20s, 40s, 80s \u2014 exactly doubling each time."},
+  {t:"A company runs a nightly data pipeline with AWS Step Functions. If the pipeline fails after step 7 of 12, the team wants to restart from step 7, not from the beginning. Which Step Functions feature supports checkpoint-based restarts?",o:["Express Workflow with checkpoints enabled", "Standard Workflow \u2014 execution history is persisted; use the 'Redrive execution' feature to restart from the last failed state", "Lambda-based checkpointing using DynamoDB", "Map state iteration resumption"],a:1,e:"Standard Workflow executions persist full execution history for up to 90 days. The 'Redrive' feature (or restarting from a specific state) allows resuming a failed execution from the last failed state. Express Workflows are ephemeral \u2014 they have no persistent history for checkpointing."},
+  {t:"An Amazon EventBridge rule triggers a Lambda function whenever a new object is created in an S3 bucket with the prefix 'data/raw/'. After deployment, the Lambda is not being triggered. What should be checked first?",o:["Lambda concurrency limit", "Whether the S3 bucket is configured to send events to EventBridge (S3 Event Notifications \u2192 EventBridge must be explicitly enabled)", "Lambda execution role permissions", "EventBridge event bus region"],a:1,e:"S3 does not automatically send events to EventBridge. The S3 bucket's 'Amazon EventBridge' integration must be explicitly enabled in the bucket's Properties \u2192 Event Notifications section. Without this toggle, EventBridge receives no S3 events regardless of rule configuration."},
+  {t:"A data engineering team wants to monitor the number of records written to S3 by a Glue ETL job each run. If the record count drops below 1,000 (indicating a potential data issue), they want an alert. Which approach enables this metric-based alerting?",o:["Use AWS CloudTrail to count S3 PutObject calls", "Emit a custom CloudWatch metric from the Glue script (e.g., records_written) and create a CloudWatch Alarm that triggers SNS when the metric falls below 1,000", "Use S3 Inventory reports to count objects", "Use AWS Config to monitor S3 write activity"],a:1,e:"Glue scripts can emit custom CloudWatch metrics using boto3's put_metric_data API. A CloudWatch Alarm with a LessThanThreshold condition on this custom metric sends an SNS alert when records_written < 1,000. This is the standard pattern for pipeline health monitoring."},
+  {t:"A company uses Amazon Athena to analyze S3 data. Multiple teams run queries simultaneously. The finance team's large queries are consuming all available resources, slowing down the ops team's lightweight queries. What Athena feature isolates these workloads?",o:["Run finance queries in us-east-2 and ops queries in us-east-1", "Create separate Athena Workgroups for each team with per-workgroup concurrency limits and query byte limits", "Use different S3 buckets for each team", "Schedule queries at different times using EventBridge"],a:1,e:"Athena Workgroups provide isolated execution environments per team. Each workgroup can have its own: query results S3 path, cost control limits (BytesScannedCutoffPerQuery), encryption settings, and query history. Queries from different workgroups do not compete for the same resource pool."},
+  {t:"A data pipeline Step Functions workflow must send a notification and then WAIT indefinitely (up to 7 days) for a human to approve or reject the data before proceeding. Which integration pattern implements this pause?",o:["Use a Wait state with a fixed 7-day timeout", "Use a Task state with waitForTaskToken \u2014 Step Functions pauses the execution until the token is returned via SendTaskSuccess or SendTaskFailure", "Use SQS with a visibility timeout", "Poll an approval API using a Map state"],a:1,e:"waitForTaskToken pauses the workflow indefinitely (up to Standard Workflow's 1-year max). The task token is sent to the approver (e.g., via email link). When approved, the approver's system calls SendTaskSuccess with the token, resuming the workflow. This is the canonical human-in-the-loop pattern."},
+  {t:"A company's Glue ETL job successfully transforms data but occasionally outputs records with NULL values in a required field. These invalid records cause downstream Redshift COPY failures. Which Glue feature validates data quality inline and routes bad records to a quarantine path?",o:["Glue Crawlers detect NULL values automatically", "AWS Glue Data Quality with a Completeness rule \u2014 set action to WARN and write records failing the rule to a quarantine S3 path in the script", "Redshift COPY with ACCEPTANYDATE option", "Lambda function validating each record after Glue writes to S3"],a:1,e:"Glue Data Quality supports a Completeness rule type that checks for NULL values. In WARN mode, the job continues and the failed-record DynamicFrame is accessible in the Glue script \u2014 write it to a quarantine S3 path. Clean records proceed to Redshift, preventing COPY failures."},
+  {t:"A team wants to build an operational dashboard showing the last 24 hours of Glue job run history \u2014 success/failure counts, average duration, and DPU hours consumed \u2014 across 30 jobs. Which AWS tool provides this with minimal setup?",o:["Build a custom application querying the Glue API every minute", "Amazon CloudWatch Dashboard with Glue metric widgets (JobRunSucceeded, JobRunFailed, glue.driver.aggregate.elapsedTime, glue.driver.aggregate.numCompletedStages)", "AWS Cost Explorer for DPU costs", "CloudTrail Lake for job event queries"],a:1,e:"Glue automatically publishes operational metrics to CloudWatch (job success/failure counts, duration, DPU usage). A CloudWatch Dashboard with metric widgets visualizes these across all 30 jobs with no custom code. Dashboards update in near real-time and support custom time ranges."},
+  {t:"An Amazon MWAA Airflow DAG fails because a task's bash command has a syntax error introduced in the latest deployment. The Airflow scheduler is now showing errors. What is the fastest way to stop the failing DAG without reverting the entire deployment?",o:["Delete the MWAA environment", "Pause the DAG using the Airflow web UI \u2014 set the DAG toggle to OFF (paused)", "Remove the DAG file from the S3 DAGs folder", "Restart the MWAA environment"],a:1,e:"The Airflow UI DAG toggle pauses a DAG instantly \u2014 no new task instances are scheduled and the scheduler stops processing it. This takes seconds and requires no deployment changes. It's the fastest, safest fix while debugging the syntax error."},
+  {t:"A data team uses AWS CloudTrail to audit their data lake. They want to query CloudTrail events using SQL to find all Glue job runs that accessed a specific S3 bucket in the last 30 days. Which CloudTrail feature supports SQL queries on event history?",o:["CloudTrail log delivery to S3 + Athena query on the CloudTrail prefix", "AWS CloudTrail Lake \u2014 ingest CloudTrail events into an event data store and run SQL queries directly", "CloudWatch Logs Insights on CloudTrail log group", "GuardDuty findings filtered by S3 bucket"],a:1,e:"CloudTrail Lake is a managed audit/analytics service that ingests CloudTrail events into a queryable event data store. SQL queries run directly in CloudTrail Lake \u2014 no S3 bucket, Athena setup, or log parsing needed. It supports complex queries with aggregations and time-range filters."},
+  {t:"A company uses Amazon QuickSight. Dashboard users report that charts sometimes show data from the previous day even after the source Redshift table has been updated. What is the most automated fix?",o:["Tell users to manually refresh their browser", "For SPICE-backed datasets: configure a scheduled SPICE dataset refresh to run after each Redshift load. For Direct Query: no action needed \u2014 it always queries live data", "Recreate the QuickSight dataset daily", "Use a different BI tool that supports live data"],a:1,e:"SPICE is QuickSight's in-memory cache \u2014 it does not auto-update when the source changes. Configure a scheduled SPICE refresh (hourly, daily, after ETL completion) in the dataset settings. If real-time data is required, switch the dataset to Direct Query mode \u2014 queries always hit Redshift live."},
+  {t:"A data pipeline must process files in S3 only once, even if the same file is deposited multiple times by the upstream system. Which architecture prevents duplicate processing?",o:["Use S3 Versioning to detect duplicates", "S3 Event Notification \u2192 SQS \u2192 Lambda. Use SQS deduplication (FIFO queue with message deduplication ID based on the S3 object key) to prevent duplicate Lambda invocations for the same file", "Schedule a Lambda to list and process S3 objects every 5 minutes", "Use Kinesis Data Streams with a 24-hour retention for deduplication"],a:1,e:"SQS FIFO queues support content-based deduplication using a MessageDeduplicationId (e.g., the S3 object key hash). If the same file triggers the same S3 event twice within the 5-minute deduplication window, SQS delivers it only once to the Lambda consumer \u2014 preventing duplicate processing."},
+  {t:"A company's data pipeline has 15 steps orchestrated by Step Functions. Step 10 calls an EMR job that runs for 3 hours. The overall workflow must complete in under 4 hours. Which Step Functions workflow type is required and why?",o:["Express Workflow \u2014 it has lower latency for long tasks", "Standard Workflow \u2014 Express Workflows have a maximum duration of 5 minutes; Standard Workflows support up to 1 year of execution duration", "Both workflow types support 3-hour tasks", "Use Lambda with SQS polling instead of Step Functions"],a:1,e:"Express Workflows have a hard maximum execution duration of 5 minutes. Any single task or the total workflow exceeding 5 minutes requires a Standard Workflow. Standard Workflows support executions lasting up to 1 year \u2014 easily accommodating a 3-hour EMR job."},
+  {t:"A company needs to run an Athena query daily at 8 AM UTC, save results to S3, and email a summary. Which combination of AWS services implements this serverless pipeline?",o:["EC2 cron job + boto3 Athena API + SES", "EventBridge Scheduler (daily 8 AM UTC cron) \u2192 Lambda (starts Athena query, polls completion, formats summary) \u2192 SES (sends email)", "CloudWatch Events \u2192 SNS \u2192 Lambda", "AWS Batch + Lambda + SES"],a:1,e:"EventBridge Scheduler handles cron-based scheduling (including one-time and recurring schedules with timezone support). Lambda runs the Athena query via API, waits for completion, formats the summary, and calls SES for email delivery. Entirely serverless \u2014 no EC2 or Batch needed."},
+  {t:"A data platform team wants to automatically detect anomalies in their pipeline metrics (e.g., sudden spikes or drops in record counts) without manually setting thresholds. Which CloudWatch feature uses ML to detect anomalies automatically?",o:["CloudWatch composite alarms", "CloudWatch Anomaly Detection \u2014 trains a model on historical metric data and alarms when the current value is outside the expected band", "AWS DevOps Guru", "CloudWatch Contributor Insights"],a:1,e:"CloudWatch Anomaly Detection uses ML to analyze historical metric data and build a model of expected behavior (accounting for time-of-day and day-of-week patterns). An alarm can be set to trigger whenever the metric deviates from the anomaly detection band \u2014 no manual threshold needed."},
+  {t:"A data engineer is debugging a Step Functions workflow that fails at step 5. They need to see the exact input and output of each state, and the error type that caused the failure. Where is this information available?",o:["CloudTrail API history for Step Functions", "The Step Functions execution history in the console \u2014 each state's input, output, and error details are visible with timestamps", "CloudWatch Logs if enabled for the workflow", "Lambda execution logs only"],a:1,e:"Standard Workflow executions persist full execution history including each state's input, output, parameters, duration, and error/cause for failed states. The Step Functions console provides a visual graph view with this detail on click \u2014 directly accessible without any additional log configuration."},
+  {t:"A company uses AWS Glue Data Quality to validate incoming data. Business rules require: (1) no NULL customer_ids, (2) order_amount > 0, (3) status must be one of 'PENDING', 'SHIPPED', 'DELIVERED'. Which DQDL rules express these checks?",o:["Write custom Lambda validation logic", "Completeness 'customer_id' >= 1.0, ColumnValues 'order_amount' > 0, ColumnValues 'status' in ['PENDING','SHIPPED','DELIVERED']", "Use Glue DataBrew profiling only", "Create a Redshift stored procedure for validation"],a:1,e:"DQDL (Data Quality Definition Language) natively supports: Completeness checks (fraction of non-NULL values), ColumnValues comparisons (numeric range, set membership). These three DQDL rules directly encode the business requirements and can be enforced inline in the Glue ETL job."},
+  {t:"A company wants to trigger a different downstream Step Functions workflow depending on whether daily sales exceeded $1M or not. The decision must be made dynamically based on data in the pipeline. Which Step Functions state implements this branching?",o:["Parallel state \u2014 run both workflows simultaneously", "Wait state for 24 hours then check", "Choice state \u2014 evaluates a condition on input data (e.g., $.total_sales > 1000000) and transitions to different states based on the result", "Map state iterating over sales records"],a:2,e:"Choice states evaluate conditions on the workflow's input data using comparison operators (NumericGreaterThan, StringEquals, etc.). Based on the evaluated condition, the workflow transitions to a different next state. This enables dynamic branching without any Lambda or custom code."},
+  {t:"A company's Amazon Athena queries fail with 'TooManyRequestsException' during peak hours when many analysts run queries simultaneously. What is the correct approach to handle this?",o:["Switch to a larger Athena instance type", "Use Athena Workgroups to distribute users and implement query queuing; consider upgrading to Athena on-demand capacity reservations for consistent performance", "Move data from S3 to Redshift for better concurrency", "Reduce the number of analysts allowed to use Athena"],a:1,e:"Athena service quotas limit concurrent queries per account. Workgroups can segment users and apply per-workgroup limits. Athena capacity reservations (pre-purchased DPU-hours) provide dedicated capacity for predictable peak workloads, eliminating service limit throttling during peak hours."},
+  {t:"A Glue ETL job writes output to S3 but the downstream Redshift COPY job fails because some output files are 0 bytes (empty Spark partition files). What Glue transformation removes empty output files?",o:["Enable Glue Job Bookmarks", "Call .repartition() or .coalesce() on the DynamicFrame/DataFrame before writing to remove empty partitions; or use Glue's built-in 'groupFiles' output option", "Increase DPU count", "Switch to Python Shell job type"],a:1,e:"Spark can write empty partition files when some executors have no records to write. Calling coalesce(N) or repartition(N) before writing consolidates non-empty data into N output files, eliminating empty files. This prevents the Redshift COPY from failing on zero-byte files."},
+  {t:"A company uses Amazon CloudWatch to monitor their data pipelines. They want a single alarm that fires only when BOTH a Glue job failure AND an associated Redshift COPY failure occur within the same 5-minute window. Which CloudWatch feature enables this multi-condition alarm?",o:["Two separate CloudWatch Alarms with separate SNS topics", "CloudWatch Composite Alarm \u2014 combines multiple alarms with AND/OR logic (ALARM(GlueJobFailAlarm) AND ALARM(RedshiftCopyFailAlarm))", "CloudWatch Logs Insights correlating both log streams", "AWS EventBridge rule matching both events"],a:1,e:"CloudWatch Composite Alarms combine multiple child alarms using AND/OR/NOT Boolean logic. A composite alarm evaluates as ALARM only when its rule expression is true (e.g., both child alarms are in ALARM state). This eliminates false positives when only one of two correlated events occurs."},
+  {t:"A company runs MWAA (Managed Apache Airflow). DAG authors write Python scripts stored in S3. When a new DAG is deployed, it should automatically be tested in a staging MWAA environment before being promoted to production. Which pattern implements this CI/CD approach?",o:["Manually copy DAG files between S3 buckets", "Use a CodePipeline with CodeBuild to run DAG syntax checks \u2192 deploy to staging MWAA S3 bucket \u2192 run integration tests \u2192 promote to production MWAA S3 bucket on success", "Configure both MWAA environments to share the same S3 DAG bucket", "Use MWAA's built-in staging feature"],a:1,e:"A CodePipeline pipeline can: pull DAG from source control, run syntax validation (python -m py_compile), deploy to the staging MWAA S3 bucket, trigger integration tests (call Airflow API to test DAG runs), and then sync to the production S3 bucket on success \u2014 a full CI/CD pipeline for Airflow DAGs."},
+  {t:"A data team uses Athena to query S3 data. After a Glue ETL job adds new daily partitions, Athena queries still cannot see the new partitions. What is the most automated, low-maintenance way to keep partitions discoverable?",o:["Run MSCK REPAIR TABLE manually after each ETL job", "Configure the Glue ETL job to use the catalog update option (enableUpdateCatalog=True, partitionUpdateMode=enableInsert) \u2014 new partitions are registered as they are written", "Schedule an Athena query to run MSCK REPAIR TABLE via EventBridge", "Re-run the Glue Crawler after each ETL job"],a:1,e:"Enabling catalog updates in the Glue job (enableUpdateCatalog=True) registers new partitions in the Glue Data Catalog as the job writes each partition. This is fully automatic \u2014 no separate Crawler, no MSCK REPAIR TABLE, no manual steps required. Athena sees new partitions immediately after the job completes."},
+  {t:"A company wants to ensure their Glue ETL job only runs if the source S3 bucket has at least 100 new files available (to avoid wasted runs on sparse data). Which architecture implements this conditional execution?",o:["Set a Glue job timeout of 1 minute \u2014 it auto-cancels if no data", "Lambda triggered by EventBridge Scheduler: count new S3 objects since last run. If count >= 100, trigger the Glue job via API. Log the result to DynamoDB", "Use Glue Workflows with a trigger condition", "CloudWatch Alarm on S3 NumberOfObjects metric \u2192 SNS \u2192 Glue"],a:1,e:"A Lambda function can use the S3 ListObjectsV2 API with a date prefix filter to count new files since the last run. If the count meets the threshold, it calls the Glue StartJobRun API. This is serverless, auditable (DynamoDB log), and prevents costly Glue job runs on sparse data."},
+  {t:"A company uses AWS Step Functions to process large batches of records. The batch is stored as a list of 10,000 item IDs in S3. The workflow must process each item concurrently using Lambda, with a maximum of 50 concurrent Lambda invocations at a time. Which Step Functions state achieves concurrent processing with a concurrency limit?",o:["Parallel state with 50 branches", "Choice state checking a counter", "Map state with MaxConcurrency=50 \u2014 iterates over the array and invokes Lambda for each item, with at most 50 concurrent invocations", "Nested Step Functions workflows"],a:2,e:"The Map state iterates over an array (or reads from S3) and invokes a child workflow/Lambda for each element. The MaxConcurrency parameter limits how many iterations run simultaneously. Setting MaxConcurrency=50 runs 50 Lambda invocations in parallel at any time, processing the 10,000 items in batches."},
+  {t:"A company runs Amazon QuickSight dashboards backed by Athena. Users complain that some queries take 60+ seconds. The underlying data is 5 TB of unpartitioned JSON in S3. What is the correct architectural fix (not a QuickSight setting)?",o:["Enable SPICE to cache the 5 TB dataset", "Convert the JSON to Parquet format and partition the data by common filter columns \u2014 Athena will scan dramatically less data per query", "Upgrade the Athena engine version only", "Switch to Direct Query mode in QuickSight"],a:1,e:"Slow Athena queries are almost always a data format/partition problem, not a QuickSight problem. Converting 5 TB JSON to Parquet and adding partitions is the root fix \u2014 Athena will scan only relevant columns and partitions. SPICE caching 5 TB is expensive and does not fix the underlying scan inefficiency."},
+  {t:"A company needs AWS CloudTrail to capture all S3 API calls (including GetObject and PutObject) for a compliance audit. After enabling CloudTrail, they notice GetObject calls are not appearing in CloudTrail. What is missing?",o:["CloudTrail must be enabled in each AWS region separately", "CloudTrail Data Events for S3 must be explicitly enabled \u2014 Management Events (default) do not capture S3 object-level API calls", "An S3 bucket policy granting CloudTrail write access", "CloudTrail Insights must be enabled"],a:1,e:"CloudTrail has two event categories: Management Events (enabled by default \u2014 IAM changes, S3 CreateBucket, etc.) and Data Events (disabled by default, additional cost \u2014 S3 object-level calls like GetObject, PutObject, DeleteObject). Data Events must be explicitly enabled per bucket or for all S3."},
+  {t:"A data engineering team runs 20+ Step Functions workflows. They want a centralized view showing which workflows are currently running, which failed in the last 24 hours, and execution counts over time \u2014 without writing custom tooling. Which AWS service provides this?",o:["Custom Lambda polling Step Functions API every minute", "Amazon CloudWatch with Step Functions metrics (ExecutionsStarted, ExecutionsFailed, ExecutionsSucceeded) displayed in a CloudWatch Dashboard", "AWS Systems Manager OpsCenter", "AWS X-Ray service map"],a:1,e:"Step Functions automatically publishes CloudWatch metrics including ExecutionsStarted, ExecutionsFailed, ExecutionsSucceeded, ExecutionsTimedOut per state machine. A CloudWatch Dashboard with metric widgets for all 20+ state machines provides the centralized operational view \u2014 no custom tooling required."},
+  {t:"A company's nightly Glue ETL job takes 2 hours to complete. A compliance requirement states that the pipeline must complete before 6 AM UTC (the job starts at 2 AM UTC, leaving a 4-hour window). If the job runs for more than 3.5 hours, the on-call engineer must be alerted. Which monitoring setup implements this?",o:["Check the Glue console manually at 5:30 AM each day", "Create a CloudWatch Alarm on the glue.driver.aggregate.elapsedTime metric with a threshold of 12,600,000 ms (3.5 hours), alarm action sends to an SNS topic that pages the on-call engineer", "Use Glue workflow run notifications", "Set a Glue job timeout to 3.5 hours \u2014 it alerts automatically"],a:1,e:"The Glue metric glue.driver.aggregate.elapsedTime tracks elapsed job time in milliseconds. A CloudWatch Alarm with a GreaterThanThreshold of 12,600,000 ms (3.5h \u00d7 3600 \u00d7 1000) triggers an SNS notification while the job is still running \u2014 giving the engineer 30 minutes to intervene before the 6 AM deadline."},
+  {t:"A company's Step Functions workflow processes customer orders. An order processing step (Lambda function) occasionally throws a custom error 'InsufficientInventoryError'. For this specific error, the workflow should route to an inventory alert task instead of the default failure path. All other errors should fail the workflow normally. How is this configured?",o:["Use a Retry block for InsufficientInventoryError", "Use a Catch block on the Lambda task state: catch 'InsufficientInventoryError' and transition to the InventoryAlertTask state; let all other errors propagate to the default failure", "Use a Choice state after every Lambda task", "Enable Step Functions error handling at the workflow level only"],a:1,e:"A Catch block can match specific error names (or wildcards). Configuring Catch with 'Error': 'InsufficientInventoryError' routes that specific error to the InventoryAlertTask. A second Catch with 'States.ALL' catches everything else and routes to the failure state \u2014 exactly the selective error routing required."},
+];
+
+let mode='timed',cur=0,ans=new Array(TOTAL).fill(null),flags=new Set(),ti=null,tLeft=TOTAL*2*60,done=false,rv=0;
+
+function setMode(m){mode=m;['timed','practice','review'].forEach(x=>document.getElementById('m-'+x).classList.toggle('on',x===m));}
+
+function showS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function startExam(){
+  ans=new Array(TOTAL).fill(null);flags=new Set();cur=0;done=false;tLeft=TOTAL*2*60;
+  buildGrid('qgrid');renderQ();showS('s-exam');
+  if(mode==='timed')startTimer();
+  else document.getElementById('timer').textContent='◎ No Limit';
+}
+
+function startTimer(){
+  clearInterval(ti);
+  ti=setInterval(()=>{
+    tLeft--;
+    const h=Math.floor(tLeft/3600),m=Math.floor((tLeft%3600)/60),s=tLeft%60;
+    const el=document.getElementById('timer');
+    el.textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    el.className='timer'+(tLeft<180?' danger':tLeft<480?' warn':'');
+    if(tLeft<=0){clearInterval(ti);doSubmit();}
+  },1000);
+}
+
+function buildGrid(gid){
+  const g=document.getElementById(gid);g.innerHTML='';
+  const isRv=gid==='rvgrid',c=isRv?rv:cur;
+  Q.forEach((_,i)=>{
+    const d=document.createElement('div');
+    let cl='qdot';
+    if(i===c)cl+=' cur';
+    if(isRv){cl+=ans[i]===Q[i].a?' r-right':ans[i]!==null?' r-wrong':' r-skip';}
+    else{if(ans[i]!==null)cl+=' done';if(flags.has(i))cl+=' flagged';}
+    d.className=cl;d.textContent=i+1;
+    d.onclick=()=>{if(isRv){rv=i;renderRev();}else{cur=i;renderQ();}};
+    g.appendChild(d);
+  });
+}
+
+function renderQ(){
+  const q=Q[cur];
+  document.getElementById('qc').textContent=cur+1;
+  document.getElementById('ac').textContent=ans.filter(a=>a!==null).length;
+  document.getElementById('prog').style.width=((cur+1)/TOTAL*100)+'%';
+  document.getElementById('qmeta').textContent='Question '+(cur+1)+' of '+TOTAL+(flags.has(cur)?' · ⚑ Flagged':'');
+  document.getElementById('qtext').textContent=q.t;
+  const oc=document.getElementById('opts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    const sel=ans[cur]===i,rv2=done||mode==='review';
+    if(rv2)d.className='opt locked'+(i===q.a?' correct':sel&&i!==q.a?' wrong':'');
+    else d.className='opt'+(sel?' sel':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    if(!done&&mode!=='review')d.onclick=()=>pick(i);
+    oc.appendChild(d);
+  });
+  const eb=document.getElementById('exp');
+  if(done||mode==='review'){eb.innerHTML='<b>Explanation:</b> '+q.e;eb.className='exp show';}
+  else eb.className='exp';
+  document.getElementById('pbtn').disabled=cur===0;
+  document.getElementById('fbtn').textContent=flags.has(cur)?'⚑ Unflag':'⚑ Flag';
+  document.getElementById('nbtn').textContent=cur===TOTAL-1?'Finish →':'Next →';
+  buildGrid('qgrid');
+}
+
+function pick(i){
+  if(done)return;
+  ans[cur]=i;renderQ();
+  if(mode==='review'){const eb=document.getElementById('exp');eb.innerHTML='<b>Explanation:</b> '+Q[cur].e;eb.className='exp show';}
+}
+
+function go(d){
+  if(cur+d>=0&&cur+d<TOTAL){cur+=d;renderQ();}
+  else if(d>0&&cur===TOTAL-1)doSubmit();
+}
+
+function flagQ(){flags.has(cur)?flags.delete(cur):flags.add(cur);renderQ();}
+
+function doSubmit(){
+  clearInterval(ti);done=true;
+  const cor=ans.filter((a,i)=>a===Q[i].a).length;
+  const sc=Math.round(100+(cor/TOTAL)*900);
+  const pass=sc>=720;
+  document.getElementById('snum').textContent=sc;
+  document.getElementById('snum').className='snum '+(pass?'pass':'fail');
+  document.getElementById('sring').className='sring '+(pass?'pass':'fail');
+  document.getElementById('verd').textContent=pass?'PASS ✓':'Not Passing Yet';
+  document.getElementById('verd').className='verd '+(pass?'pass':'fail');
+  document.getElementById('rsub').textContent=cor+'/'+TOTAL+' correct · '+Math.round(cor/TOTAL*100)+'% · Threshold: 720 scaled';
+  showS('s-results');
+}
+
+function goRev(){
+  rv=0;
+  document.getElementById('rvscr').textContent=ans.filter((a,i)=>a===Q[i].a).length+'/'+TOTAL+' correct';
+  buildGrid('rvgrid');renderRev();showS('s-review');
+}
+
+function renderRev(){
+  const q=Q[rv];
+  document.getElementById('rvc').textContent=rv+1;
+  const st=ans[rv]===q.a?'✓ Correct':ans[rv]!==null?'✗ Incorrect':'— Skipped';
+  const sc2=ans[rv]===q.a?'#3fcf8e':ans[rv]!==null?'#f25c54':'#7a8394';
+  document.getElementById('rvmeta').innerHTML='Question '+(rv+1)+' — <span style="color:'+sc2+';font-weight:600">'+st+'</span>';
+  document.getElementById('rvtext').textContent=q.t;
+  const oc=document.getElementById('rvopts');oc.innerHTML='';
+  const ks=['A','B','C','D'];
+  q.o.forEach((o,i)=>{
+    const d=document.createElement('div');
+    d.className='opt locked'+(i===q.a?' correct':ans[rv]===i?' wrong':'');
+    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+    oc.appendChild(d);
+  });
+  document.getElementById('rvexp').innerHTML='<b>Explanation:</b> '+q.e;
+  document.getElementById('rvpb').disabled=rv===0;
+  document.getElementById('rvnb').textContent=rv===TOTAL-1?'Done →':'Next →';
+  buildGrid('rvgrid');
+}
+
+function rvGo(d){
+  if(rv+d>=0&&rv+d<TOTAL){rv+=d;renderRev();}
+  else if(d>0)showS('s-results');
+}
+
+function reset(){showS('s-start');}
+</script>
+</body>
+</html>
