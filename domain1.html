@@ -122,10 +122,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <div id="s-exam" class="screen">
   <div class="topbar">
-    <div class="topbar-info">Q <span id="qc">1</span>/31 &nbsp;·&nbsp; Done: <span id="ac">0</span></div>
+    <div class="topbar-info">Q <span id="qc">1</span>/30 &nbsp;·&nbsp; Done: <span id="ac">0</span></div>
     <div class="timer" id="timer">1:00:00</div>
   </div>
-  <div class="prog-track"><div class="prog-fill" id="prog" style="width:3.2%"></div></div>
+  <div class="prog-track"><div class="prog-fill" id="prog" style="width:3.3333%"></div></div>
   <div id="qgrid" class="qgrid"></div>
   <div class="qcard">
     <div id="dtag" class="dtag">Domain 1 · Data Ingestion & Transformation</div>
@@ -163,7 +163,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <div id="s-review" class="screen">
   <div class="rvhdr">
-    <span class="rvmeta">Review · Q <span id="rvc">1</span>/31</span>
+    <span class="rvmeta">Review · Q <span id="rvc">1</span>/30</span>
     <span class="rvmeta" id="rvscr"></span>
   </div>
   <div id="rvgrid" class="qgrid"></div>
@@ -183,168 +183,282 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 </div>
 <script>
-const TOTAL=30;
-const MINS=1;
-const Q=[
-  {t:"A company must ingest real-time stock tick data with sub-100ms latency for an algorithmic trading platform. The data arrives at 50,000 records per second. Which AWS service is the correct choice?",o:["Amazon Kinesis Data Firehose", "Amazon SQS FIFO Queue", "Amazon Kinesis Data Streams", "Amazon EventBridge"],a:2,e:"Kinesis Data Streams delivers sub-second (typically sub-100ms) real-time streaming with guaranteed ordering within a shard. Firehose buffers for at least 60 seconds \u2014 it is near real-time, not real-time. SQS and EventBridge do not provide the throughput or ordering guarantees needed here."},
-  {t:"A Glue ETL job processes a 1 TB Parquet dataset in S3 daily. The next day's job must only process files written after the previous job completed \u2014 no files should be reprocessed. What should be enabled?",o:["Increase Glue DPU count", "Enable Glue Job Bookmarks", "Set a date filter in the Glue script using yesterday's date", "Use Glue Crawlers to detect new files"],a:1,e:"Glue Job Bookmarks persistently track which S3 files have already been successfully processed. On subsequent runs, only new or modified files are read. This is the native, managed solution \u2014 hardcoding dates requires manual maintenance and breaks on missed runs."},
-  {t:"A Kinesis Data Stream has 6 shards. All producers write records using partition key 'sensor_data'. CloudWatch shows GetRecords.WriteProvisionedThroughputExceeded errors on shard 1 only. What is the root cause and fix?",o:["Add more shards to increase total throughput", "All records route to shard 1 because the partition key has zero cardinality \u2014 change to a high-cardinality key like sensor_id", "Enable Enhanced Fan-Out to distribute load", "Increase the stream retention period"],a:1,e:"Kinesis hashes the partition key to determine the target shard. A single partition key value always hashes to the same shard, sending 100% of traffic to one shard while others are idle. Using a high-cardinality key (e.g., sensor_id, device_uuid) distributes records evenly across all shards."},
-  {t:"A company needs to ingest data from Salesforce into Amazon S3 daily. The team has no experience writing Salesforce API integrations and wants a no-code, managed solution. Which AWS service is designed for this?",o:["AWS DMS", "Amazon AppFlow", "AWS Glue with a custom connector", "Amazon Kinesis Data Firehose with a Salesforce source"],a:1,e:"Amazon AppFlow provides native, pre-built connectors for SaaS platforms including Salesforce, ServiceNow, Slack, and Marketo. Flows can be scheduled (e.g., daily) or event-triggered. No code is required. DMS is for database migration, not SaaS API ingestion."},
-  {t:"A Glue ETL job joins a 900 GB fact table with a 3 GB lookup table from S3. The job is slow due to a shuffle-heavy sort-merge join. Which Spark optimization in Glue eliminates the shuffle for the lookup table?",o:["Convert the lookup table to ORC format", "Use the Spark broadcast join hint to broadcast the 3 GB lookup table to all executors", "Increase Glue DPUs to 100", "Partition the fact table by the join key"],a:1,e:"A broadcast join sends the smaller table to every executor in memory, eliminating the network shuffle of the large fact table. For tables under ~8 GB, broadcasting is almost always faster than a sort-merge join. The Spark hint is: spark.sql('SELECT /*+ BROADCAST(lookup) */ ...')."},
-  {t:"AWS DMS is replicating an Oracle source to Amazon Aurora PostgreSQL. After the full load, the DMS CDC task is enabled. The DBA notices some UPDATE operations on the Oracle side are not appearing in Aurora. What is the most likely cause?",o:["Aurora does not support CDC from Oracle", "Supplemental logging is not enabled on the Oracle source database", "The DMS replication instance is too small", "CDC requires Oracle Enterprise Edition"],a:1,e:"Oracle CDC (via LogMiner) requires supplemental logging to be enabled at the database level (ALL COLUMNS supplemental logging for full row capture). Without it, DMS cannot determine the before and after values of updated rows and skips those changes."},
-  {t:"A company streams IoT sensor data via Kinesis Data Firehose to Amazon S3. The S3 objects are very small (avg 80 KB) because sensors send infrequent bursts. Downstream Athena queries are slow due to the small file problem. What Firehose setting resolves this?",o:["Enable Firehose data transformation with Lambda", "Increase the Firehose buffer size to 128 MB and buffer interval to 900 seconds", "Enable S3 Intelligent-Tiering on the destination bucket", "Switch to Kinesis Data Streams"],a:1,e:"Firehose flushes to S3 when either the buffer size (MB) OR the buffer interval (seconds) threshold is reached. Increasing both to their maximums (128 MB, 900s) allows more records to accumulate per file, producing fewer, larger objects \u2014 better for Athena query performance."},
-  {t:"A team migrates 80 TB of historical data from on-premises Oracle to Amazon Redshift. Network bandwidth is limited to 100 Mbps. The migration must complete within 5 days. Which approach is most feasible?",o:["Use AWS DMS full-load task over the existing network", "Ship data using AWS Snowball Edge, load to S3, use Redshift COPY \u2014 run DMS CDC concurrently to capture changes", "Use AWS DataSync over Direct Connect", "Compress data and use SCP to S3"],a:1,e:"At 100 Mbps, 80 TB would take ~73 days over the network. Snowball Edge handles the bulk transfer offline (days), then DMS CDC captures changes that occurred during the Snowball transfer window, enabling a near-zero-downtime cutover without exceeding bandwidth constraints."},
-  {t:"A Glue Spark ETL job reading from S3 fails with OutOfMemoryError on executor nodes when processing a specific date partition that contains 50 GB of data in a single large file. What are the TWO best fixes?",o:["Increase Glue worker type to G.2X or G.4X for more executor memory", "Enable Glue Job Bookmarks", "Re-partition the large file into multiple smaller files (e.g., using Glue or EMR repartition)", "Switch to a Python Shell job type"],a:0,e:"(Multiple answer) Upgrading to G.2X workers (8 vCPUs, 32 GB each) gives executors more memory for large partitions. Re-partitioning the large file lets multiple executors process it in parallel, each handling a smaller chunk \u2014 both reduce peak memory pressure per executor."},
-  {t:"A company runs Kinesis Data Analytics (Apache Flink) to process a Kinesis Data Stream. The Flink job must calculate a 10-minute sliding window of average sensor temperature. Some sensor events arrive up to 5 minutes late due to network delays. Which Flink feature handles late data?",o:["Increase Kinesis shard count", "Configure event-time processing with a 5-minute watermark to allow for late event arrival", "Use processing-time windows instead of event-time windows", "Enable Kinesis Enhanced Fan-Out"],a:1,e:"Apache Flink event-time watermarks define how late data is tolerated. A 5-minute watermark tells Flink to wait up to 5 minutes past the end of a window before closing it and emitting results, ensuring late-arriving events are included in the correct time window."},
-  {t:"A company needs to replicate data from Amazon DynamoDB to Amazon S3 in near real-time for analytics. Changes must be captured as they happen (inserts, updates, deletes). Which DynamoDB feature enables this?",o:["DynamoDB Export to S3 (point-in-time)", "DynamoDB Streams \u2192 Lambda \u2192 S3 write", "DynamoDB Global Tables with an S3 replica region", "AWS Glue JDBC connector polling DynamoDB every minute"],a:1,e:"DynamoDB Streams capture item-level changes (INSERT, MODIFY, REMOVE) as an ordered log. A Lambda function triggered by the stream can process and write each change to S3 in near real-time. DynamoDB Export is a point-in-time snapshot, not continuous replication."},
-  {t:"A data engineer needs to convert 10 TB of nested JSON files in S3 to Parquet, flatten nested arrays, and write output back to S3. The team wants a visual, no-code interface to build and apply this transformation. Which AWS service is purpose-built for this?",o:["AWS Glue Studio (visual ETL)", "AWS Glue DataBrew", "Amazon EMR with Jupyter Notebook", "AWS Lambda with S3 trigger"],a:1,e:"AWS Glue DataBrew provides a visual, no-code data preparation interface with 250+ built-in transformations including JSON flattening, array expansion, and format conversion to Parquet. Glue Studio is a visual ETL canvas but requires more Spark knowledge for complex transformations."},
-  {t:"A streaming pipeline uses Kinesis Data Streams \u2192 Lambda for real-time processing. During a traffic spike, Lambda invocations are throttled and records are not being processed. The shard iterator age is growing. What is the correct fix?",o:["Increase Kinesis shard count", "Increase Lambda reserved concurrency or request an account concurrency limit increase", "Enable Kinesis Data Firehose as a buffer", "Switch to SQS instead of Kinesis"],a:1,e:"Lambda processes Kinesis shards synchronously \u2014 one concurrent invocation per shard. If the account concurrency limit is reached, new invocations are throttled. Increasing reserved concurrency for this specific function or requesting an account limit increase resolves the bottleneck."},
-  {t:"A company receives partner data via SFTP daily. Files must be automatically ingested into Amazon S3 without any EC2 servers. Which AWS service provides a fully managed SFTP endpoint that writes directly to S3?",o:["AWS DataSync with SFTP agent", "AWS Transfer Family (SFTP server)", "Amazon S3 Transfer Acceleration", "Lambda function polling an SFTP server"],a:1,e:"AWS Transfer Family provides a managed SFTP/FTPS/FTP server with S3 (or EFS) as the backend storage. Partners connect to the Transfer Family endpoint and files land directly in S3 \u2014 no EC2 SFTP server, no patching, no management overhead."},
-  {t:"A Glue ETL job reads a DynamoDB table with 5 million items using the default connector. The job is very slow because DynamoDB reads are sequential. What Glue connection option parallelizes DynamoDB reads?",o:["Enable DynamoDB Streams for the source table", "Increase the 'dynamodb.splits' parameter to allow multiple parallel scan segments", "Use DynamoDB DAX to speed up reads", "Run the Glue job with more DPUs only"],a:1,e:"DynamoDB Parallel Scan allows splitting the table into N segments, each scanned independently. The Glue DynamoDB connector's 'dynamodb.splits' option controls the number of parallel segments. Increasing it allows multiple Spark executors to read different table segments simultaneously."},
-  {t:"A company uses AWS Glue with the Glue Data Catalog to manage schemas. A new version of a source table adds 3 optional columns. Existing Parquet files do not have these columns. Athena queries using SELECT * must still work on both old and new files. What enables this?",o:["Rewrite all old Parquet files to add the new columns with NULL values", "Enable schema merging in Athena (SET s3_parquet_merge_schema=true) and add new column definitions to the Glue Data Catalog table", "Create separate Glue tables for old and new schema versions", "Use Avro format instead of Parquet"],a:1,e:"Athena's schema merging (parquet_schema_resolution=column_name or enabling schema merging) reads files with different but compatible schemas by matching column names. Old files return NULL for missing new columns. New column definitions in the Glue Catalog complete the setup \u2014 no file rewrites needed."},
-  {t:"A company processes web server logs using an EMR Spark job. The logs are stored as gzip-compressed text files in S3. The Spark job runs very slowly because it cannot process multiple files in parallel efficiently. What is the root cause?",o:["EMR does not support S3 storage \u2014 use HDFS", "Gzip is not splittable \u2014 a single gzip file cannot be split into multiple Spark tasks, so each file is processed by one executor", "Spark on EMR does not read text files", "The EMR cluster needs more master nodes"],a:1,e:"Gzip compression is not splittable. Each gzip file must be decompressed sequentially by a single Spark task \u2014 Spark cannot split it across multiple executors. The fix is to use a splittable format (Parquet with Snappy, or bzip2 for text) or to re-partition the data into many smaller files."},
-  {t:"A Kinesis Data Firehose delivery stream needs to enrich each event with a geolocation lookup before writing to S3. The lookup requires querying a DynamoDB table. How is this enrichment applied inline with Firehose?",o:["Configure a Glue Crawler on the Firehose stream", "Attach a Lambda transformation function to the Firehose delivery stream \u2014 Lambda looks up DynamoDB and returns the enriched record", "Use Kinesis Data Analytics before Firehose", "Write a Step Functions workflow triggered by Firehose"],a:1,e:"Kinesis Data Firehose supports inline Lambda transformation. The Lambda function receives a batch of records, performs the DynamoDB lookup, appends the geolocation data, and returns the enriched records. Firehose then writes the transformed records to S3."},
-  {t:"A data team has a Glue ETL pipeline that reads 500 partitions from S3. On each run, the Glue job spends 8 minutes listing S3 objects before any processing begins. What is the most effective way to reduce this listing overhead?",o:["Increase Glue DPUs to parallelize the listing", "Use partition pruning \u2014 pass pushdown predicates to limit the partitions Glue needs to list to only those relevant to the current job run", "Enable Glue Job Bookmarks", "Convert S3 files from Parquet to CSV"],a:1,e:"Partition pushdown predicates (e.g., push_down_predicate parameter in Glue's getSink) tell Glue to only list and read the specific partitions matching the filter. Instead of listing all 500 partitions, Glue only lists the few relevant ones \u2014 dramatically reducing S3 API call overhead."},
-  {t:"A company uses Kinesis Data Streams with 10 shards. A new requirement asks for 5 independent consumer applications, each reading the full stream at 2 MB/s per shard. What configuration supports this without consumers throttling each other?",o:["Create 5 separate Kinesis streams \u2014 one per consumer", "Enable Enhanced Fan-Out and register each of the 5 consumers \u2014 each gets a dedicated 2 MB/s per shard pipe", "Increase shard count to 50", "Use Kinesis Data Firehose as a fan-out layer"],a:1,e:"Enhanced Fan-Out (EFO) provides each registered consumer with a dedicated 2 MB/s per shard throughput over a persistent HTTP/2 connection. Without EFO, all consumers share the 2 MB/s per shard read limit. EFO eliminates consumer-to-consumer throttling with no shard changes needed."},
-  {t:"A company's AWS Glue jobs use Apache Spark to process data. A developer notices the Spark UI shows a few tasks taking 10x longer than others (data skew). The skewed partition contains records for one high-volume customer. What is the recommended Spark fix?",o:["Add more Glue DPUs", "Apply salting \u2014 add a random prefix to the skewed key to distribute records across more partitions", "Use Glue DataBrew instead", "Partition the data by a different column entirely"],a:1,e:"Data skew occurs when one partition key value has far more records than others. Salting appends a random suffix (e.g., customerA_1, customerA_2... customerA_N) to split the hot key across N partitions, distributing the workload evenly across executors."},
-  {t:"A company uses AWS DMS to perform an ongoing CDC replication from MySQL to Amazon S3 in CSV format. They now want the S3 files in Parquet format to support Athena queries. Which DMS endpoint setting changes the output format?",o:["Change the DMS task type from CDC to Full Load", "Update the S3 target endpoint settings to set 'dataFormat' to 'parquet' and configure Parquet-specific settings", "Create a separate Glue job to convert CSV files after DMS writes them", "Enable DMS Schema Conversion Tool"],a:1,e:"AWS DMS S3 target endpoints support 'dataFormat': 'parquet' in the endpoint extra connection attributes or settings. DMS writes Parquet files directly without a separate conversion step. This is supported for both full-load and CDC tasks."},
-  {t:"A real-time pipeline must detect when Kinesis Data Streams records have not been consumed for more than 5 minutes (consumer stalled). Which CloudWatch metric signals this condition?",o:["IncomingRecords count dropping to zero", "GetRecords.IteratorAgeMilliseconds exceeding 300,000 ms (5 minutes)", "PutRecords.FailedRecordCount increasing", "ReadProvisionedThroughputExceeded increasing"],a:1,e:"IteratorAgeMilliseconds measures the age of the oldest unprocessed record in the shard \u2014 how far behind the consumer is from the tip of the stream. If it exceeds 300,000 ms (5 minutes), consumers are stalled or not running. A CloudWatch Alarm on this metric provides the alert."},
-  {t:"A company uses Glue Streaming to process data from Kinesis. The streaming job must write micro-batch results to S3 and also update a DynamoDB table with aggregated counts in each batch. Which Glue Streaming feature controls the micro-batch commit interval?",o:["Glue Job Bookmarks", "The 'windowSize' parameter in the Glue Streaming job configuration (e.g., '60 seconds')", "Kinesis shard count determines micro-batch size", "Lambda trigger on the output S3 bucket"],a:1,e:"Glue Streaming jobs use the 'windowSize' option to define the micro-batch interval. Each window accumulates records and then the Glue script processes and commits them. Setting windowSize to '60 seconds' means the job processes and writes a batch every 60 seconds."},
-  {t:"A company has Kinesis Data Streams producers in an on-premises data center. They want to reduce the number of API calls and improve throughput. Which Kinesis producer feature batches multiple records into a single API call?",o:["Enhanced Fan-Out", "PutRecords API (batch put) or the Kinesis Producer Library (KPL) aggregation", "Kinesis Data Firehose buffering", "Increasing shard count"],a:1,e:"The PutRecords API writes up to 500 records per API call. The KPL further aggregates multiple logical records into a single Kinesis record using a proprietary format, achieving up to 1000x reduction in API calls and significantly improving producer throughput."},
-  {t:"A data team runs EMR jobs to process Parquet files. They notice adding more executor instances beyond 20 does not improve performance \u2014 the job runs at the same speed. What is the most likely bottleneck?",o:["EMR has a maximum of 20 executors", "The dataset has 20 Parquet files \u2014 Spark creates one task per file, so more executors than files provides no parallelism benefit", "The EMR master node is too small", "S3 throttles reads beyond 20 concurrent connections"],a:1,e:"Spark parallelism is limited by the number of input partitions (approximately one per file by default). With only 20 files, adding the 21st+ executor gives it nothing to do. The fix is to repartition the data into more files (e.g., 200) so Spark can utilize all executors."},
-  {t:"An Apache Kafka producer on-premises sends Avro messages to Amazon MSK. The schemas are managed in the AWS Glue Schema Registry. A consumer reads messages using a schema that is older than the producer's current schema. Which compatibility mode ensures the consumer can still read new messages?",o:["NONE \u2014 disable compatibility checks", "BACKWARD \u2014 new schemas must be readable by code using the previous schema version", "FORWARD \u2014 old schemas must be readable by code using the new schema version", "FULL \u2014 schemas must be both backward and forward compatible"],a:1,e:"BACKWARD compatibility means consumers using the OLD schema can read data written with the NEW schema. This is achieved by only adding new fields with defaults. It is the most common mode \u2014 it protects consumers from breaking when producers evolve their schema."},
-  {t:"A company runs a Glue job that reads from S3 and writes to Amazon Redshift using a JDBC connection. The Glue job is the bottleneck because it writes rows one by one via JDBC. What is the correct high-performance pattern?",o:["Increase Glue DPUs for more parallel JDBC writers", "Write Glue output to S3 as Parquet, then use Redshift COPY command to load from S3 in parallel", "Use Redshift Spectrum instead of writing to Redshift", "Switch to a Python Shell Glue job"],a:1,e:"JDBC row-by-row inserts are extremely slow for large datasets. The correct pattern is: Glue writes output to S3 \u2192 Redshift COPY loads from S3 in parallel across all compute nodes. COPY is orders of magnitude faster than any JDBC insert approach."},
-  {t:"A streaming application must compute session-based analytics \u2014 grouping all user events in a single browsing session. Sessions end after 30 minutes of inactivity. Which Kinesis Data Analytics (Flink) window type models this correctly?",o:["Tumbling window (fixed 30-minute intervals)", "Sliding window (30-minute window, 5-minute slide)", "Session window with a 30-minute gap threshold", "Global window with a count trigger"],a:2,e:"Session windows group events that occur within a defined gap of each other. A 30-minute gap threshold means a session window stays open as long as events arrive within 30 minutes of each other. When no event arrives for 30 minutes, the window closes \u2014 exactly modeling user session behavior."},
-  {t:"A company wants to ingest data from Amazon RDS MySQL to S3 in near real-time without modifying any application code. The solution must capture ongoing INSERTs, UPDATEs, and DELETEs. Which service combination achieves this?",o:["Schedule a Glue job every minute to query new rows", "AWS DMS CDC task reading MySQL binlogs \u2192 write to S3 in Parquet format", "RDS automated backups \u2192 restore to S3", "Lambda function polling the RDS database every minute"],a:1,e:"AWS DMS CDC reads the MySQL binary log to capture row-level changes (INSERT, UPDATE, DELETE) as they occur. The DMS S3 target writes these changes to S3 in Parquet (or other) format in near real-time, with no application changes and minimal source database impact."}
+const TOTAL = 30;
+const Q = [
+  {t:"A company must ingest real-time stock tick data with sub-100ms latency for an algorithmic trading platform. The data arrives at 50,000 records per second. Which AWS service is the correct choice?",o:["Amazon Kinesis Data Firehose","Amazon SQS FIFO Queue","Amazon Kinesis Data Streams","Amazon EventBridge"],a:2,e:"Kinesis Data Streams delivers sub-second (typically sub-100ms) real-time streaming with guaranteed ordering within a shard. Firehose buffers for at least 60 seconds — it is near real-time, not real-time. SQS and EventBridge do not provide the throughput or ordering guarantees needed here."},
+  {t:"A Glue ETL job processes a 1 TB Parquet dataset in S3 daily. The next day's job must only process files written after the previous job completed — no files should be reprocessed. What should be enabled?",o:["Increase Glue DPU count","Enable Glue Job Bookmarks","Set a date filter in the Glue script using yesterday's date","Use Glue Crawlers to detect new files"],a:1,e:"Glue Job Bookmarks persistently track which S3 files have already been successfully processed. On subsequent runs, only new or modified files are read. This is the native, managed solution — hardcoding dates requires manual maintenance and breaks on missed runs."},
+  {t:"A Kinesis Data Stream has 6 shards. All producers write records using partition key 'sensor_data'. CloudWatch shows GetRecords.WriteProvisionedThroughputExceeded errors on shard 1 only. What is the root cause and fix?",o:["Add more shards to increase total throughput","All records route to shard 1 because the partition key has zero cardinality — change to a high-cardinality key like sensor_id","Enable Enhanced Fan-Out to distribute load","Increase the stream retention period"],a:1,e:"Kinesis hashes the partition key to determine the target shard. A single partition key value always hashes to the same shard, sending 100% of traffic to one shard while others are idle. Using a high-cardinality key (e.g., sensor_id, device_uuid) distributes records evenly across all shards."},
+  {t:"A company needs to ingest data from Salesforce into Amazon S3 daily. The team has no experience writing Salesforce API integrations and wants a no-code, managed solution. Which AWS service is designed for this?",o:["AWS DMS","Amazon AppFlow","AWS Glue with a custom connector","Amazon Kinesis Data Firehose with a Salesforce source"],a:1,e:"Amazon AppFlow provides native, pre-built connectors for SaaS platforms including Salesforce, ServiceNow, Slack, and Marketo. Flows can be scheduled (e.g., daily) or event-triggered. No code is required. DMS is for database migration, not SaaS API ingestion."},
+  {t:"A Glue ETL job joins a 900 GB fact table with a 3 GB lookup table from S3. The job is slow due to a shuffle-heavy sort-merge join. Which Spark optimization in Glue eliminates the shuffle for the lookup table?",o:["Convert the lookup table to ORC format","Use the Spark broadcast join hint to broadcast the 3 GB lookup table to all executors","Increase Glue DPUs to 100","Partition the fact table by the join key"],a:1,e:"A broadcast join sends the smaller table to every executor in memory, eliminating the network shuffle of the large fact table. For tables under ~8 GB, broadcasting is almost always faster than a sort-merge join."},
+  {t:"AWS DMS is replicating an Oracle source to Amazon Aurora PostgreSQL. After the full load, the DMS CDC task is enabled. The DBA notices some UPDATE operations on the Oracle side are not appearing in Aurora. What is the most likely cause?",o:["Aurora does not support CDC from Oracle","Supplemental logging is not enabled on the Oracle source database","The DMS replication instance is too small","CDC requires Oracle Enterprise Edition"],a:1,e:"Oracle CDC (via LogMiner) requires supplemental logging to be enabled at the database level. Without it, DMS cannot determine the before and after values of updated rows and skips those changes."},
+  {t:"A company streams IoT sensor data via Kinesis Data Firehose to Amazon S3. The S3 objects are very small (avg 80 KB) because sensors send infrequent bursts. Downstream Athena queries are slow due to the small file problem. What Firehose setting resolves this?",o:["Enable Firehose data transformation with Lambda","Increase the Firehose buffer size to 128 MB and buffer interval to 900 seconds","Enable S3 Intelligent-Tiering on the destination bucket","Switch to Kinesis Data Streams"],a:1,e:"Firehose flushes to S3 when either the buffer size or the buffer interval threshold is reached. Increasing both allows more records to accumulate per file, producing fewer, larger objects — better for Athena query performance."},
+  {t:"A team migrates 80 TB of historical data from on-premises Oracle to Amazon Redshift. Network bandwidth is limited to 100 Mbps. The migration must complete within 5 days. Which approach is most feasible?",o:["Use AWS DMS full-load task over the existing network","Ship data using AWS Snowball Edge, load to S3, use Redshift COPY — run DMS CDC concurrently to capture changes","Use AWS DataSync over Direct Connect","Compress data and use SCP to S3"],a:1,e:"At 100 Mbps, 80 TB would take far too long over the network. Snowball Edge handles the bulk transfer offline, then DMS CDC captures changes that occurred during the transfer window."},
+  {t:"A Glue Spark ETL job reading from S3 fails with OutOfMemoryError on executor nodes when processing a specific date partition that contains 50 GB of data in a single large file. What are the TWO best fixes?",o:["Increase Glue worker type to G.2X or G.4X for more executor memory","Enable Glue Job Bookmarks","Re-partition the large file into multiple smaller files","Switch to a Python Shell job type"],a:0,e:"This is presented as a single-answer question in the current UI, so the best available choice is increasing Glue worker memory. In practice, re-partitioning the large file is also a strong fix because it improves parallelism and reduces peak memory pressure."},
+  {t:"A company runs Kinesis Data Analytics (Apache Flink) to process a Kinesis Data Stream. The Flink job must calculate a 10-minute sliding window of average sensor temperature. Some sensor events arrive up to 5 minutes late due to network delays. Which Flink feature handles late data?",o:["Increase Kinesis shard count","Configure event-time processing with a 5-minute watermark to allow for late event arrival","Use processing-time windows instead of event-time windows","Enable Kinesis Enhanced Fan-Out"],a:1,e:"Apache Flink event-time watermarks define how late data is tolerated. A 5-minute watermark tells Flink to wait up to 5 minutes past the end of a window before closing it."},
+  {t:"A company needs to replicate data from Amazon DynamoDB to Amazon S3 in near real-time for analytics. Changes must be captured as they happen (inserts, updates, deletes). Which DynamoDB feature enables this?",o:["DynamoDB Export to S3 (point-in-time)","DynamoDB Streams → Lambda → S3 write","DynamoDB Global Tables with an S3 replica region","AWS Glue JDBC connector polling DynamoDB every minute"],a:1,e:"DynamoDB Streams capture item-level changes as an ordered log. A Lambda function triggered by the stream can process and write each change to S3 in near real-time."},
+  {t:"A data engineer needs to convert 10 TB of nested JSON files in S3 to Parquet, flatten nested arrays, and write output back to S3. The team wants a visual, no-code interface to build and apply this transformation. Which AWS service is purpose-built for this?",o:["AWS Glue Studio (visual ETL)","AWS Glue DataBrew","Amazon EMR with Jupyter Notebook","AWS Lambda with S3 trigger"],a:1,e:"AWS Glue DataBrew provides a visual, no-code data preparation interface with many built-in transformations including JSON flattening, array expansion, and format conversion to Parquet."},
+  {t:"A streaming pipeline uses Kinesis Data Streams → Lambda for real-time processing. During a traffic spike, Lambda invocations are throttled and records are not being processed. The shard iterator age is growing. What is the correct fix?",o:["Increase Kinesis shard count","Increase Lambda reserved concurrency or request an account concurrency limit increase","Enable Kinesis Data Firehose as a buffer","Switch to SQS instead of Kinesis"],a:1,e:"Lambda processes Kinesis shards synchronously. If the account concurrency limit is reached, new invocations are throttled. Increasing reserved concurrency or the account limit resolves the bottleneck."},
+  {t:"A company receives partner data via SFTP daily. Files must be automatically ingested into Amazon S3 without any EC2 servers. Which AWS service provides a fully managed SFTP endpoint that writes directly to S3?",o:["AWS DataSync with SFTP agent","AWS Transfer Family (SFTP server)","Amazon S3 Transfer Acceleration","Lambda function polling an SFTP server"],a:1,e:"AWS Transfer Family provides a managed SFTP/FTPS/FTP server with S3 or EFS as the backend storage. Partners connect to the endpoint and files land directly in S3."},
+  {t:"A Glue ETL job reads a DynamoDB table with 5 million items using the default connector. The job is very slow because DynamoDB reads are sequential. What Glue connection option parallelizes DynamoDB reads?",o:["Enable DynamoDB Streams for the source table","Increase the 'dynamodb.splits' parameter to allow multiple parallel scan segments","Use DynamoDB DAX to speed up reads","Run the Glue job with more DPUs only"],a:1,e:"DynamoDB Parallel Scan allows splitting the table into multiple segments, each scanned independently. The Glue connector's 'dynamodb.splits' option controls the number of parallel segments."},
+  {t:"A company uses AWS Glue with the Glue Data Catalog to manage schemas. A new version of a source table adds 3 optional columns. Existing Parquet files do not have these columns. Athena queries using SELECT * must still work on both old and new files. What enables this?",o:["Rewrite all old Parquet files to add the new columns with NULL values","Enable schema merging in Athena and add new column definitions to the Glue Data Catalog table","Create separate Glue tables for old and new schema versions","Use Avro format instead of Parquet"],a:1,e:"Athena can read compatible schema variations by matching column names. Old files return NULL for missing new columns after the Glue Data Catalog is updated."},
+  {t:"A company processes web server logs using an EMR Spark job. The logs are stored as gzip-compressed text files in S3. The Spark job runs very slowly because it cannot process multiple files in parallel efficiently. What is the root cause?",o:["EMR does not support S3 storage — use HDFS","Gzip is not splittable — a single gzip file cannot be split into multiple Spark tasks, so each file is processed by one executor","Spark on EMR does not read text files","The EMR cluster needs more master nodes"],a:1,e:"Gzip compression is not splittable. Each gzip file must be decompressed sequentially by a single Spark task, which limits parallelism."},
+  {t:"A Kinesis Data Firehose delivery stream needs to enrich each event with a geolocation lookup before writing to S3. The lookup requires querying a DynamoDB table. How is this enrichment applied inline with Firehose?",o:["Configure a Glue Crawler on the Firehose stream","Attach a Lambda transformation function to the Firehose delivery stream — Lambda looks up DynamoDB and returns the enriched record","Use Kinesis Data Analytics before Firehose","Write a Step Functions workflow triggered by Firehose"],a:1,e:"Kinesis Data Firehose supports inline Lambda transformation. The function receives a batch of records, performs the DynamoDB lookup, and returns enriched records to Firehose."},
+  {t:"A data team has a Glue ETL pipeline that reads 500 partitions from S3. On each run, the Glue job spends 8 minutes listing S3 objects before any processing begins. What is the most effective way to reduce this listing overhead?",o:["Increase Glue DPUs to parallelize the listing","Use partition pruning — pass pushdown predicates to limit the partitions Glue needs to list","Enable Glue Job Bookmarks","Convert S3 files from Parquet to CSV"],a:1,e:"Partition pushdown predicates tell Glue to only list and read the partitions relevant to the current job run, dramatically reducing S3 listing overhead."},
+  {t:"A company uses Kinesis Data Streams with 10 shards. A new requirement asks for 5 independent consumer applications, each reading the full stream at 2 MB/s per shard. What configuration supports this without consumers throttling each other?",o:["Create 5 separate Kinesis streams — one per consumer","Enable Enhanced Fan-Out and register each of the 5 consumers — each gets a dedicated 2 MB/s per shard pipe","Increase shard count to 50","Use Kinesis Data Firehose as a fan-out layer"],a:1,e:"Enhanced Fan-Out gives each registered consumer a dedicated 2 MB/s per shard throughput pipe, so consumers do not contend with each other."},
+  {t:"A company's AWS Glue jobs use Apache Spark to process data. A developer notices the Spark UI shows a few tasks taking 10x longer than others (data skew). The skewed partition contains records for one high-volume customer. What is the recommended Spark fix?",o:["Add more Glue DPUs","Apply salting — add a random prefix to the skewed key to distribute records across more partitions","Use Glue DataBrew instead","Partition the data by a different column entirely"],a:1,e:"Salting appends a random suffix to a hot key so that skewed records are spread across more partitions and processed more evenly."},
+  {t:"A company uses AWS DMS to perform an ongoing CDC replication from MySQL to Amazon S3 in CSV format. They now want the S3 files in Parquet format to support Athena queries. Which DMS endpoint setting changes the output format?",o:["Change the DMS task type from CDC to Full Load","Update the S3 target endpoint settings to set 'dataFormat' to 'parquet' and configure Parquet-specific settings","Create a separate Glue job to convert CSV files after DMS writes them","Enable DMS Schema Conversion Tool"],a:1,e:"AWS DMS S3 target endpoints support writing Parquet directly by configuring the endpoint output format."},
+  {t:"A real-time pipeline must detect when Kinesis Data Streams records have not been consumed for more than 5 minutes (consumer stalled). Which CloudWatch metric signals this condition?",o:["IncomingRecords count dropping to zero","GetRecords.IteratorAgeMilliseconds exceeding 300,000 ms (5 minutes)","PutRecords.FailedRecordCount increasing","ReadProvisionedThroughputExceeded increasing"],a:1,e:"IteratorAgeMilliseconds measures how far behind the consumer is from the tip of the stream. A value over 300,000 ms indicates stalled or lagging consumption."},
+  {t:"A company uses Glue Streaming to process data from Kinesis. The streaming job must write micro-batch results to S3 and also update a DynamoDB table with aggregated counts in each batch. Which Glue Streaming feature controls the micro-batch commit interval?",o:["Glue Job Bookmarks","The 'windowSize' parameter in the Glue Streaming job configuration","Kinesis shard count determines micro-batch size","Lambda trigger on the output S3 bucket"],a:1,e:"Glue Streaming jobs use the windowSize option to define the micro-batch interval for processing and committing batches."},
+  {t:"A company has Kinesis Data Streams producers in an on-premises data center. They want to reduce the number of API calls and improve throughput. Which Kinesis producer feature batches multiple records into a single API call?",o:["Enhanced Fan-Out","PutRecords API (batch put) or the Kinesis Producer Library (KPL) aggregation","Kinesis Data Firehose buffering","Increasing shard count"],a:1,e:"PutRecords writes multiple records per API call, and the KPL can aggregate many logical records to reduce API calls even further."},
+  {t:"A data team runs EMR jobs to process Parquet files. They notice adding more executor instances beyond 20 does not improve performance — the job runs at the same speed. What is the most likely bottleneck?",o:["EMR has a maximum of 20 executors","The dataset has 20 Parquet files — Spark creates roughly one task per file, so more executors than files provides no parallelism benefit","The EMR master node is too small","S3 throttles reads beyond 20 concurrent connections"],a:1,e:"Spark parallelism is limited by the number of input partitions. With only 20 files, adding more executors gives them no additional work."},
+  {t:"An Apache Kafka producer on-premises sends Avro messages to Amazon MSK. The schemas are managed in the AWS Glue Schema Registry. A consumer reads messages using a schema that is older than the producer's current schema. Which compatibility mode ensures the consumer can still read new messages?",o:["NONE — disable compatibility checks","BACKWARD — new schemas must be readable by code using the previous schema version","FORWARD — old schemas must be readable by code using the new schema version","FULL — schemas must be both backward and forward compatible"],a:1,e:"Backward compatibility ensures consumers using the old schema can still read data produced with the new schema, usually by adding fields with defaults."},
+  {t:"A company runs a Glue job that reads from S3 and writes to Amazon Redshift using a JDBC connection. The Glue job is the bottleneck because it writes rows one by one via JDBC. What is the correct high-performance pattern?",o:["Increase Glue DPUs for more parallel JDBC writers","Write Glue output to S3 as Parquet, then use Redshift COPY command to load from S3 in parallel","Use Redshift Spectrum instead of writing to Redshift","Switch to a Python Shell Glue job"],a:1,e:"JDBC row-by-row inserts are slow at scale. The high-performance pattern is writing to S3 and then loading into Redshift with COPY."},
+  {t:"A streaming application must compute session-based analytics — grouping all user events in a single browsing session. Sessions end after 30 minutes of inactivity. Which Kinesis Data Analytics (Flink) window type models this correctly?",o:["Tumbling window (fixed 30-minute intervals)","Sliding window (30-minute window, 5-minute slide)","Session window with a 30-minute gap threshold","Global window with a count trigger"],a:2,e:"Session windows group events as long as they continue arriving within the configured inactivity gap. A 30-minute gap threshold models a browsing session correctly."},
+  {t:"A company wants to ingest data from Amazon RDS MySQL to S3 in near real-time without modifying any application code. The solution must capture ongoing INSERTs, UPDATEs, and DELETEs. Which service combination achieves this?",o:["Schedule a Glue job every minute to query new rows","AWS DMS CDC task reading MySQL binlogs → write to S3 in Parquet format","RDS automated backups → restore to S3","Lambda function polling the RDS database every minute"],a:1,e:"AWS DMS CDC reads MySQL binlogs to capture row-level changes as they occur and can write them to S3 in Parquet format with minimal source impact."}
+];
 
+let mode = 'timed';
+let cur = 0;
+let ans = new Array(TOTAL).fill(null);
+let flags = new Set();
+let ti = null;
+let tLeft = TOTAL * 2 * 60;
+let done = false;
+let rv = 0;
 
-let mode='timed',cur=0,ans=new Array(TOTAL).fill(null),flags=new Set(),ti=null,tLeft=TOTAL*2*60,done=false,rv=0;
+function setMode(m){
+  mode = m;
+  ['timed','practice','review'].forEach(x => {
+    document.getElementById('m-' + x).classList.toggle('on', x === m);
+  });
+}
 
-function setMode(m){mode=m;['timed','practice','review'].forEach(x=>document.getElementById('m-'+x).classList.toggle('on',x===m));}
-
-function showS(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function showS(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
 function startExam(){
-  ans=new Array(TOTAL).fill(null);flags=new Set();cur=0;done=false;tLeft=TOTAL*2*60;
-  buildGrid('qgrid');renderQ();showS('s-exam');
-  if(mode==='timed')startTimer();
-  else document.getElementById('timer').textContent='◎ No Limit';
+  ans = new Array(TOTAL).fill(null);
+  flags = new Set();
+  cur = 0;
+  done = false;
+  rv = 0;
+  tLeft = TOTAL * 2 * 60;
+
+  buildGrid('qgrid');
+  renderQ();
+  showS('s-exam');
+
+  const timerEl = document.getElementById('timer');
+  timerEl.className = 'timer';
+
+  if(mode === 'timed'){
+    timerEl.textContent = formatTime(tLeft);
+    startTimer();
+  } else {
+    clearInterval(ti);
+    timerEl.textContent = '◎ No Limit';
+  }
+}
+
+function formatTime(seconds){
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  return (h ? h + ':' : '') + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
 function startTimer(){
   clearInterval(ti);
-  ti=setInterval(()=>{
+  ti = setInterval(() => {
     tLeft--;
-    const h=Math.floor(tLeft/3600),m=Math.floor((tLeft%3600)/60),s=tLeft%60;
-    const el=document.getElementById('timer');
-    el.textContent=(h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-    el.className='timer'+(tLeft<180?' danger':tLeft<480?' warn':'');
-    if(tLeft<=0){clearInterval(ti);doSubmit();}
-  },1000);
+    const el = document.getElementById('timer');
+    el.textContent = formatTime(tLeft);
+    el.className = 'timer' + (tLeft < 180 ? ' danger' : tLeft < 480 ? ' warn' : '');
+    if(tLeft <= 0){
+      clearInterval(ti);
+      doSubmit();
+    }
+  }, 1000);
 }
 
 function buildGrid(gid){
-  const g=document.getElementById(gid);g.innerHTML='';
-  const isRv=gid==='rvgrid',c=isRv?rv:cur;
-  Q.forEach((_,i)=>{
-    const d=document.createElement('div');
-    let cl='qdot';
-    if(i===c)cl+=' cur';
-    if(isRv){cl+=ans[i]===Q[i].a?' r-right':ans[i]!==null?' r-wrong':' r-skip';}
-    else{if(ans[i]!==null)cl+=' done';if(flags.has(i))cl+=' flagged';}
-    d.className=cl;d.textContent=i+1;
-    d.onclick=()=>{if(isRv){rv=i;renderRev();}else{cur=i;renderQ();}};
+  const g = document.getElementById(gid);
+  g.innerHTML = '';
+  const isRv = gid === 'rvgrid';
+  const currentIndex = isRv ? rv : cur;
+
+  Q.forEach((_, i) => {
+    const d = document.createElement('div');
+    let cl = 'qdot';
+
+    if(i === currentIndex) cl += ' cur';
+
+    if(isRv){
+      cl += ans[i] === Q[i].a ? ' r-right' : ans[i] !== null ? ' r-wrong' : ' r-skip';
+    } else {
+      if(ans[i] !== null) cl += ' done';
+      if(flags.has(i)) cl += ' flagged';
+    }
+
+    d.className = cl;
+    d.textContent = i + 1;
+    d.onclick = () => {
+      if(isRv){
+        rv = i;
+        renderRev();
+      } else {
+        cur = i;
+        renderQ();
+      }
+    };
     g.appendChild(d);
   });
 }
 
 function renderQ(){
-  const q=Q[cur];
-  document.getElementById('qc').textContent=cur+1;
-  document.getElementById('ac').textContent=ans.filter(a=>a!==null).length;
-  document.getElementById('prog').style.width=((cur+1)/TOTAL*100)+'%';
-  document.getElementById('qmeta').textContent='Question '+(cur+1)+' of '+TOTAL+(flags.has(cur)?' · ⚑ Flagged':'');
-  document.getElementById('qtext').textContent=q.t;
-  const oc=document.getElementById('opts');oc.innerHTML='';
-  const ks=['A','B','C','D'];
-  q.o.forEach((o,i)=>{
-    const d=document.createElement('div');
-    const sel=ans[cur]===i,rv2=done||mode==='review';
-    if(rv2)d.className='opt locked'+(i===q.a?' correct':sel&&i!==q.a?' wrong':'');
-    else d.className='opt'+(sel?' sel':'');
-    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
-    if(!done&&mode!=='review')d.onclick=()=>pick(i);
+  const q = Q[cur];
+  document.getElementById('qc').textContent = cur + 1;
+  document.getElementById('ac').textContent = ans.filter(a => a !== null).length;
+  document.getElementById('prog').style.width = ((cur + 1) / TOTAL * 100) + '%';
+  document.getElementById('qmeta').textContent = 'Question ' + (cur + 1) + ' of ' + TOTAL + (flags.has(cur) ? ' · ⚑ Flagged' : '');
+  document.getElementById('qtext').textContent = q.t;
+
+  const oc = document.getElementById('opts');
+  oc.innerHTML = '';
+  const ks = ['A','B','C','D'];
+
+  q.o.forEach((o, i) => {
+    const d = document.createElement('div');
+    const sel = ans[cur] === i;
+    const reveal = done || mode === 'review';
+
+    if(reveal){
+      d.className = 'opt locked' + (i === q.a ? ' correct' : sel && i !== q.a ? ' wrong' : '');
+    } else {
+      d.className = 'opt' + (sel ? ' sel' : '');
+    }
+
+    d.innerHTML = '<span class="ok">' + ks[i] + '</span><span class="ot">' + o + '</span>';
+
+    if(!done && mode !== 'review'){
+      d.onclick = () => pick(i);
+    }
+
     oc.appendChild(d);
   });
-  const eb=document.getElementById('exp');
-  if(done||mode==='review'){eb.innerHTML='<b>Explanation:</b> '+q.e;eb.className='exp show';}
-  else eb.className='exp';
-  document.getElementById('pbtn').disabled=cur===0;
-  document.getElementById('fbtn').textContent=flags.has(cur)?'⚑ Unflag':'⚑ Flag';
-  document.getElementById('nbtn').textContent=cur===TOTAL-1?'Finish →':'Next →';
+
+  const eb = document.getElementById('exp');
+  if(done || mode === 'review'){
+    eb.innerHTML = '<b>Explanation:</b> ' + q.e;
+    eb.className = 'exp show';
+  } else {
+    eb.className = 'exp';
+    eb.innerHTML = '';
+  }
+
+  document.getElementById('pbtn').disabled = cur === 0;
+  document.getElementById('fbtn').textContent = flags.has(cur) ? '⚑ Unflag' : '⚑ Flag';
+  document.getElementById('nbtn').textContent = cur === TOTAL - 1 ? 'Finish →' : 'Next →';
+
   buildGrid('qgrid');
 }
 
 function pick(i){
-  if(done)return;
-  ans[cur]=i;renderQ();
-  if(mode==='review'){const eb=document.getElementById('exp');eb.innerHTML='<b>Explanation:</b> '+Q[cur].e;eb.className='exp show';}
+  if(done) return;
+  ans[cur] = i;
+  renderQ();
+
+  if(mode === 'review'){
+    const eb = document.getElementById('exp');
+    eb.innerHTML = '<b>Explanation:</b> ' + Q[cur].e;
+    eb.className = 'exp show';
+  }
 }
 
 function go(d){
-  if(cur+d>=0&&cur+d<TOTAL){cur+=d;renderQ();}
-  else if(d>0&&cur===TOTAL-1)doSubmit();
+  if(cur + d >= 0 && cur + d < TOTAL){
+    cur += d;
+    renderQ();
+  } else if(d > 0 && cur === TOTAL - 1){
+    doSubmit();
+  }
 }
 
-function flagQ(){flags.has(cur)?flags.delete(cur):flags.add(cur);renderQ();}
+function flagQ(){
+  if(flags.has(cur)) flags.delete(cur);
+  else flags.add(cur);
+  renderQ();
+}
 
 function doSubmit(){
-  clearInterval(ti);done=true;
-  const cor=ans.filter((a,i)=>a===Q[i].a).length;
-  const sc=Math.round(100+(cor/TOTAL)*900);
-  const pass=sc>=720;
-  document.getElementById('snum').textContent=sc;
-  document.getElementById('snum').className='snum '+(pass?'pass':'fail');
-  document.getElementById('sring').className='sring '+(pass?'pass':'fail');
-  document.getElementById('verd').textContent=pass?'PASS ✓':'Not Passing Yet';
-  document.getElementById('verd').className='verd '+(pass?'pass':'fail');
-  document.getElementById('rsub').textContent=cor+'/'+TOTAL+' correct · '+Math.round(cor/TOTAL*100)+'% · Threshold: 720 scaled';
+  clearInterval(ti);
+  done = true;
+
+  const cor = ans.filter((a, i) => a === Q[i].a).length;
+  const sc = Math.round(100 + (cor / TOTAL) * 900);
+  const pass = sc >= 720;
+
+  document.getElementById('snum').textContent = sc;
+  document.getElementById('snum').className = 'snum ' + (pass ? 'pass' : 'fail');
+  document.getElementById('sring').className = 'sring ' + (pass ? 'pass' : 'fail');
+  document.getElementById('verd').textContent = pass ? 'PASS ✓' : 'Not Passing Yet';
+  document.getElementById('verd').className = 'verd ' + (pass ? 'pass' : 'fail');
+  document.getElementById('rsub').textContent = cor + '/' + TOTAL + ' correct · ' + Math.round(cor / TOTAL * 100) + '% · Threshold: 720 scaled';
+
   showS('s-results');
 }
 
 function goRev(){
-  rv=0;
-  document.getElementById('rvscr').textContent=ans.filter((a,i)=>a===Q[i].a).length+'/'+TOTAL+' correct';
-  buildGrid('rvgrid');renderRev();showS('s-review');
+  rv = 0;
+  document.getElementById('rvscr').textContent = ans.filter((a, i) => a === Q[i].a).length + '/' + TOTAL + ' correct';
+  buildGrid('rvgrid');
+  renderRev();
+  showS('s-review');
 }
 
 function renderRev(){
-  const q=Q[rv];
-  document.getElementById('rvc').textContent=rv+1;
-  const st=ans[rv]===q.a?'✓ Correct':ans[rv]!==null?'✗ Incorrect':'— Skipped';
-  const sc2=ans[rv]===q.a?'#3fcf8e':ans[rv]!==null?'#f25c54':'#7a8394';
-  document.getElementById('rvmeta').innerHTML='Question '+(rv+1)+' — <span style="color:'+sc2+';font-weight:600">'+st+'</span>';
-  document.getElementById('rvtext').textContent=q.t;
-  const oc=document.getElementById('rvopts');oc.innerHTML='';
-  const ks=['A','B','C','D'];
-  q.o.forEach((o,i)=>{
-    const d=document.createElement('div');
-    d.className='opt locked'+(i===q.a?' correct':ans[rv]===i?' wrong':'');
-    d.innerHTML='<span class="ok">'+ks[i]+'</span><span class="ot">'+o+'</span>';
+  const q = Q[rv];
+  document.getElementById('rvc').textContent = rv + 1;
+
+  const st = ans[rv] === q.a ? '✓ Correct' : ans[rv] !== null ? '✗ Incorrect' : '— Skipped';
+  const sc2 = ans[rv] === q.a ? '#3fcf8e' : ans[rv] !== null ? '#f25c54' : '#7a8394';
+
+  document.getElementById('rvmeta').innerHTML = 'Question ' + (rv + 1) + ' — <span style="color:' + sc2 + ';font-weight:600">' + st + '</span>';
+  document.getElementById('rvtext').textContent = q.t;
+
+  const oc = document.getElementById('rvopts');
+  oc.innerHTML = '';
+  const ks = ['A','B','C','D'];
+
+  q.o.forEach((o, i) => {
+    const d = document.createElement('div');
+    d.className = 'opt locked' + (i === q.a ? ' correct' : ans[rv] === i ? ' wrong' : '');
+    d.innerHTML = '<span class="ok">' + ks[i] + '</span><span class="ot">' + o + '</span>';
     oc.appendChild(d);
   });
-  document.getElementById('rvexp').innerHTML='<b>Explanation:</b> '+q.e;
-  document.getElementById('rvpb').disabled=rv===0;
-  document.getElementById('rvnb').textContent=rv===TOTAL-1?'Done →':'Next →';
+
+  document.getElementById('rvexp').innerHTML = '<b>Explanation:</b> ' + q.e;
+  document.getElementById('rvpb').disabled = rv === 0;
+  document.getElementById('rvnb').textContent = rv === TOTAL - 1 ? 'Done →' : 'Next →';
+
   buildGrid('rvgrid');
 }
 
 function rvGo(d){
-  if(rv+d>=0&&rv+d<TOTAL){rv+=d;renderRev();}
-  else if(d>0)showS('s-results');
+  if(rv + d >= 0 && rv + d < TOTAL){
+    rv += d;
+    renderRev();
+  } else if(d > 0){
+    showS('s-results');
+  }
 }
 
-function reset(){showS('s-start');}
+function reset(){
+  clearInterval(ti);
+  showS('s-start');
+}
 </script>
 </body>
 </html>
